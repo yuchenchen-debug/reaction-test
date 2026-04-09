@@ -40,6 +40,11 @@ html,body{height:100%;overflow:hidden;font-family:'JetBrains Mono',monospace;-we
   --gray:#888;--white:#f0f0f0;
 }
 
+/* Language Switcher */
+.lang-switcher{position:fixed;top:12px;right:12px;z-index:200}
+.lang-switcher select{background:#1a1a2a;color:var(--white);border:1px solid #333;border-radius:8px;padding:6px 28px 6px 10px;font-family:inherit;font-size:12px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.lang-switcher select:hover{border-color:#555}
+
 /* States */
 #game{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background-color .05s;cursor:pointer;overflow:hidden}
 #game.state-menu{background:var(--dark);cursor:default}
@@ -137,20 +142,37 @@ html,body{height:100%;overflow:hidden;font-family:'JetBrains Mono',monospace;-we
 </head>
 <body>
 
+<!-- Language Switcher -->
+<div class="lang-switcher">
+  <select id="langSelect">
+    <option value="zh-TW">繁體中文</option>
+    <option value="en">English</option>
+    <option value="ja">日本語</option>
+    <option value="ko">한국어</option>
+    <option value="es">Español</option>
+    <option value="pt">Português</option>
+    <option value="de">Deutsch</option>
+    <option value="fr">Français</option>
+    <option value="th">ภาษาไทย</option>
+    <option value="id">Bahasa Indonesia</option>
+    <option value="vi">Tiếng Việt</option>
+  </select>
+</div>
+
 <div id="game" class="state-menu">
 
   <!-- MENU -->
   <div id="menu-screen" class="screen active">
-    <h1>⚡ 反應力測試</h1>
-    <p class="subtitle">你的反應速度有多快？</p>
+    <h1 data-i18n="title">⚡ 反應力測試</h1>
+    <p class="subtitle" data-i18n="subtitle">你的反應速度有多快？</p>
     <div class="stats-box">
-      <div class="stat">累計 <span id="total-players">3,291,847</span> 人測試</div>
-      <div class="stat">人類平均反應時間: <span>273ms</span></div>
-      <div class="stat">世界紀錄: <span>121ms</span> (🇰🇷 FlashKim)</div>
+      <div class="stat"><span data-i18n="statPlayers">累計</span> <span id="total-players">3,291,847</span> <span data-i18n="statPlayersSuffix">人測試</span></div>
+      <div class="stat" data-i18n="statAvg">人類平均反應時間: <span>273ms</span></div>
+      <div class="stat" data-i18n="statRecord">世界紀錄: <span>121ms</span> (🇰🇷 FlashKim)</div>
     </div>
-    <button class="btn" id="startBtn">開始測試</button>
+    <button class="btn" id="startBtn" data-i18n="startBtn">開始測試</button>
     <div class="menu-btns">
-      <button class="btn btn-sm btn-outline" id="lbBtn">🏆 排行榜</button>
+      <button class="btn btn-sm btn-outline" id="lbBtn" data-i18n="lbBtn">🏆 排行榜</button>
     </div>
     <div id="pb-display"></div>
     <div class="ad-slot"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4737693030554043" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins></div>
@@ -158,30 +180,30 @@ html,body{height:100%;overflow:hidden;font-family:'JetBrains Mono',monospace;-we
 
   <!-- WAITING (RED) -->
   <div id="wait-screen" class="screen">
-    <div class="msg">等待...</div>
-    <div class="round-indicator">第 <span id="roundNum">1</span> / 5 輪</div>
+    <div class="msg" data-i18n="waitMsg">等待...</div>
+    <div class="round-indicator"><span data-i18n="roundPrefix">第</span> <span id="roundNum">1</span> / 5 <span data-i18n="roundSuffix">輪</span></div>
   </div>
 
   <!-- READY (GREEN) -->
   <div id="ready-screen" class="screen">
-    <div class="msg">按！</div>
-    <div class="sub">快點！</div>
+    <div class="msg" data-i18n="readyMsg">按！</div>
+    <div class="sub" data-i18n="readySub">快點！</div>
   </div>
 
   <!-- TOO EARLY (BLUE) -->
   <div id="early-screen" class="screen">
-    <div class="msg">犯規！</div>
+    <div class="msg" data-i18n="earlyMsg">犯規！</div>
     <div class="taunt" id="earlyTaunt"></div>
-    <div class="tap-hint">點擊繼續</div>
+    <div class="tap-hint" data-i18n="tapHint">點擊繼續</div>
   </div>
 
   <!-- ROUND RESULT -->
   <div id="result-screen" class="screen">
     <div class="ms-display" id="msDisplay"></div>
-    <div class="ms-label">毫秒</div>
+    <div class="ms-label" data-i18n="msLabel">毫秒</div>
     <div class="taunt" id="roundTaunt"></div>
     <div class="round-info" id="roundInfo"></div>
-    <div class="tap-hint">點擊繼續</div>
+    <div class="tap-hint" data-i18n="tapHint2">點擊繼續</div>
   </div>
 
   <!-- FINAL RESULT -->
@@ -189,24 +211,24 @@ html,body{height:100%;overflow:hidden;font-family:'JetBrains Mono',monospace;-we
     <div class="rank-badge" id="rankBadge"></div>
     <div class="rank-label" id="rankLabel"></div>
     <div class="avg-display" id="avgDisplay"></div>
-    <div class="avg-label">平均反應時間</div>
+    <div class="avg-label" data-i18n="avgLabel">平均反應時間</div>
     <div class="taunt-final" id="tauntFinal"></div>
     <div class="age-compare" id="ageCompare"></div>
     <div class="percentile" id="percentile"></div>
     <div class="rounds-list" id="roundsList"></div>
     <div class="share-section">
-      <h3>分享你的成績</h3>
+      <h3 data-i18n="shareTitle">分享你的成績</h3>
       <div class="share-btns">
         <button class="share-btn line" id="shareLine">LINE</button>
         <button class="share-btn twitter" id="shareTwitter">𝕏 Twitter</button>
-        <button class="share-btn copy" id="shareCopy">📋 複製</button>
+        <button class="share-btn copy" id="shareCopy" data-i18n="copyBtn">📋 複製</button>
         <button class="share-btn ig" id="shareIG">IG Story</button>
-        <button class="share-btn dl" id="shareDL">📥 下載圖片</button>
+        <button class="share-btn dl" id="shareDL" data-i18n="dlBtn">📥 下載圖片</button>
       </div>
     </div>
     <div class="final-btns">
-      <button class="btn" id="retryBtn">再測一次</button>
-      <button class="btn btn-sm btn-outline" id="lbBtn2">🏆 排行榜</button>
+      <button class="btn" id="retryBtn" data-i18n="retryBtn">再測一次</button>
+      <button class="btn btn-sm btn-outline" id="lbBtn2" data-i18n="lbBtn">🏆 排行榜</button>
     </div>
     <div class="ad-slot"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4737693030554043" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins></div>
     <div id="pb-final"></div>
@@ -216,15 +238,1033 @@ html,body{height:100%;overflow:hidden;font-family:'JetBrains Mono',monospace;-we
 <!-- Leaderboard modal -->
 <div class="modal-overlay" id="lbModal">
   <div class="modal">
-    <h2>🏆 排行榜 TOP 20</h2>
+    <h2 data-i18n="lbTitle">🏆 排行榜 TOP 20</h2>
     <div id="lbList"></div>
-    <button class="close-btn" id="closeLb">關閉</button>
+    <button class="close-btn" id="closeLb" data-i18n="closeBtn">關閉</button>
   </div>
 </div>
 
 <canvas id="shareCanvas" width="1080" height="1080"></canvas>
 
 <script>
+// ==================== i18n ====================
+const LANG = {
+  'zh-TW': {
+    title: '⚡ 反應力測試',
+    subtitle: '你的反應速度有多快？',
+    statPlayers: '累計',
+    statPlayersSuffix: '人測試',
+    statAvg: '人類平均反應時間: <span>273ms</span>',
+    statRecord: '世界紀錄: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: '開始測試',
+    lbBtn: '🏆 排行榜',
+    waitMsg: '等待...',
+    roundPrefix: '第',
+    roundSuffix: '輪',
+    readyMsg: '按！',
+    readySub: '快點！',
+    earlyMsg: '犯規！',
+    tapHint: '點擊繼續',
+    tapHint2: '點擊繼續',
+    msLabel: '毫秒',
+    avgLabel: '平均反應時間',
+    shareTitle: '分享你的成績',
+    copyBtn: '📋 複製',
+    copiedBtn: '✅ 已複製',
+    dlBtn: '📥 下載圖片',
+    retryBtn: '再測一次',
+    lbTitle: '🏆 排行榜 TOP 20',
+    closeBtn: '關閉',
+    lbLoading: '載入中...',
+    lbEmpty: '還沒有記錄',
+    lbError: '無法載入',
+    pbLabel: '個人最佳',
+    newPB: '🎉 新個人最佳！',
+    roundLabel: (i) => `第 ${i} 輪`,
+    foulText: '犯規 (+1000ms)',
+    roundInfo: (c, t) => `第 ${c} / ${t} 輪`,
+    percentileText: (pct) => `你的成績超越了 ${pct}% 的玩家`,
+    metaTitle: '反應力測試 - 你的反應速度有多快？',
+    metaDesc: '測試你的反應速度！5 輪挑戰，看看你是電競選手級還是烏龜級。累計超過 300 萬人測試過！',
+    ogTitle: '反應力測試 - 我的反應速度是 ???ms',
+    ogDesc: '測試你的反應速度！5 輪挑戰，看看你是電競選手級還是烏龜級 ⚡',
+    twitterTitle: '反應力測試 ⚡',
+    twitterDesc: '測試你的反應速度！你比人類平均快還是慢？',
+    shareCanvasTitle: '⚡ 反應力測試',
+    shareCanvasAvg: '平均反應時間',
+    shareCanvasFoul: '犯規',
+    moreGames: '🎮 更多挑戰',
+    game1Name: '千分之一秒',
+    game1Hook: '只有 0.01% 拿到 SSS 級',
+    game2Name: '色覺測試',
+    game2Hook: '只有 2.1% 通過 Level 25',
+    game3Name: '記憶極限',
+    game3Hook: '一般人記住 7 個，你呢？',
+    earlyTaunts: ["太早了！你是不是偷看？","耐心是美德","急什麼！等綠色啊","你搶跑了 🏃","冷靜點，深呼吸"],
+    roundTaunts: {
+      150: ["...你是開掛的吧？","人類不可能有這種反應","你是機器人嗎？"],
+      180: ["電競選手級","你的神經傳導速度異常","可以去打職業了"],
+      220: ["還不錯","比大部分人快","中上水準"],
+      270: ["普通人類","平均水準，沒什麼好驕傲的","一般般"],
+      350: ["有點慢...","你是剛睡醒嗎","需要咖啡嗎"],
+      500: ["烏龜級反應力","你奶奶可能比你快","是不是在看手機"],
+      9999:["你確定你還活著嗎","建議去醫院檢查","...你睡著了？"]
+    },
+    rankLabels: {
+      SSS: '前 0.01% — 非人類',
+      SS: '前 0.1%',
+      S: '前 1%',
+      A: '前 5%',
+      B: '前 20%',
+      C: '前 50%',
+      D: '前 80%',
+      F: '請確認你還有脈搏'
+    },
+    ageCompare: [
+      [160, "你的反應力比 18 歲電競選手還快"],
+      [200, "你的反應力相當於 20 歲年輕人"],
+      [240, "你的反應力相當於 25 歲成年人"],
+      [280, "你的反應力相當於 35 歲上班族"],
+      [330, "你的反應力比 45 歲中年人還慢一點"],
+      [400, "你的反應力相當於 55 歲退休人士"],
+      [500, "你的反應力比 65 歲老人還慢"],
+      [9999, "你的反應力比 80 歲老人還慢...建議多運動"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ 反應力測試結果\n\n🏅 等級: ${rank}\n⏱️ 平均: ${avg}ms\n📊 ${label}\n\n${taunt}\n\n你能比我快嗎？👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'en': {
+    title: '⚡ Reaction Test',
+    subtitle: 'How fast are your reflexes?',
+    statPlayers: '',
+    statPlayersSuffix: 'people tested',
+    statAvg: 'Human average: <span>273ms</span>',
+    statRecord: 'World record: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: 'Start Test',
+    lbBtn: '🏆 Leaderboard',
+    waitMsg: 'Wait...',
+    roundPrefix: 'Round',
+    roundSuffix: '',
+    readyMsg: 'TAP!',
+    readySub: 'NOW!',
+    earlyMsg: 'Too early!',
+    tapHint: 'Tap to continue',
+    tapHint2: 'Tap to continue',
+    msLabel: 'milliseconds',
+    avgLabel: 'Average Reaction Time',
+    shareTitle: 'Share Your Score',
+    copyBtn: '📋 Copy',
+    copiedBtn: '✅ Copied',
+    dlBtn: '📥 Download Image',
+    retryBtn: 'Try Again',
+    lbTitle: '🏆 Leaderboard TOP 20',
+    closeBtn: 'Close',
+    lbLoading: 'Loading...',
+    lbEmpty: 'No records yet',
+    lbError: 'Failed to load',
+    pbLabel: 'Personal best',
+    newPB: '🎉 New personal best!',
+    roundLabel: (i) => `Round ${i}`,
+    foulText: 'Foul (+1000ms)',
+    roundInfo: (c, t) => `Round ${c} / ${t}`,
+    percentileText: (pct) => `You beat ${pct}% of all players`,
+    metaTitle: 'Reaction Test - How Fast Are You?',
+    metaDesc: 'Test your reaction speed! 5 rounds, find out if you are pro-gamer tier or turtle tier.',
+    ogTitle: 'Reaction Test - My speed is ???ms',
+    ogDesc: 'Test your reaction speed! 5 rounds of pure reflexes ⚡',
+    twitterTitle: 'Reaction Test ⚡',
+    twitterDesc: 'Test your reaction speed! Are you faster than the human average?',
+    shareCanvasTitle: '⚡ Reaction Test',
+    shareCanvasAvg: 'Average Reaction Time',
+    shareCanvasFoul: 'Foul',
+    moreGames: '🎮 More Challenges',
+    game1Name: 'Millisecond Challenge',
+    game1Hook: 'Only 0.01% get SSS rank',
+    game2Name: 'Color IQ Test',
+    game2Hook: 'Only 2.1% pass Level 25',
+    game3Name: 'Memory Limit',
+    game3Hook: 'Average person remembers 7. You?',
+    earlyTaunts: ["Bro jumped before the gun 💀","Patience is a virtue you clearly lack","Sir, this is a reaction test, not a guessing test","Imagine being THIS impatient","Skill issue tbh"],
+    roundTaunts: {
+      150: ["Are you even human???","Literally unhuman. Reported.","Ok you're definitely botting 🤖"],
+      180: ["Esports ready fr fr","Your neurons built different","Go pro or go home"],
+      220: ["Not bad, not bad","Better than most NPCs out there","Solid mid-to-upper tier"],
+      270: ["Perfectly average. Congrats, I guess.","You are the definition of mid","Peak human mediocrity achieved"],
+      350: ["Did you just wake up from a nap?","Might wanna grab some coffee ☕","Loading... loading... ah there you are"],
+      500: ["Bro is running on 3fps 💀","Your grandma could probably beat this","Were you reading your texts?"],
+      9999:["Are you still alive?","Please consult a medical professional","Did you fall asleep? Genuinely asking"]
+    },
+    rankLabels: {
+      SSS: 'Top 0.01% — Inhuman',
+      SS: 'Top 0.1%',
+      S: 'Top 1%',
+      A: 'Top 5%',
+      B: 'Top 20%',
+      C: 'Top 50%',
+      D: 'Top 80%',
+      F: 'Please check your pulse'
+    },
+    ageCompare: [
+      [160, "Your reflexes beat an 18-year-old esports pro"],
+      [200, "Your reflexes match a 20-year-old"],
+      [240, "Your reflexes match a 25-year-old"],
+      [280, "Your reflexes match a 35-year-old office worker"],
+      [330, "Your reflexes are slower than a 45-year-old"],
+      [400, "Your reflexes match a 55-year-old retiree"],
+      [500, "Your reflexes are slower than a 65-year-old"],
+      [9999, "Your reflexes are slower than an 80-year-old... exercise more"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ Reaction Test Result\n\n🏅 Rank: ${rank}\n⏱️ Average: ${avg}ms\n📊 ${label}\n\n${taunt}\n\nCan you beat me? 👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'ja': {
+    title: '⚡ 反射神経テスト',
+    subtitle: 'あなたの反応速度は？',
+    statPlayers: '累計',
+    statPlayersSuffix: '人がテスト済み',
+    statAvg: '人間の平均反応時間: <span>273ms</span>',
+    statRecord: '世界記録: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: 'テスト開始',
+    lbBtn: '🏆 ランキング',
+    waitMsg: '待って...',
+    roundPrefix: '第',
+    roundSuffix: 'ラウンド',
+    readyMsg: 'タップ！',
+    readySub: '今すぐ！',
+    earlyMsg: 'フライング！',
+    tapHint: 'タップして続行',
+    tapHint2: 'タップして続行',
+    msLabel: 'ミリ秒',
+    avgLabel: '平均反応時間',
+    shareTitle: '結果をシェア',
+    copyBtn: '📋 コピー',
+    copiedBtn: '✅ コピー済み',
+    dlBtn: '📥 画像保存',
+    retryBtn: 'もう一度',
+    lbTitle: '🏆 ランキング TOP 20',
+    closeBtn: '閉じる',
+    lbLoading: '読み込み中...',
+    lbEmpty: 'まだ記録がありません',
+    lbError: '読み込めませんでした',
+    pbLabel: '自己ベスト',
+    newPB: '🎉 自己ベスト更新！',
+    roundLabel: (i) => `第${i}ラウンド`,
+    foulText: 'フライング (+1000ms)',
+    roundInfo: (c, t) => `第${c} / ${t}ラウンド`,
+    percentileText: (pct) => `あなたは全プレイヤーの${pct}%を上回りました`,
+    metaTitle: '反射神経テスト - あなたの反応速度は？',
+    metaDesc: '反応速度テスト！5ラウンドで、あなたはプロゲーマー級か亀級か？',
+    ogTitle: '反射神経テスト - 私の反応速度は ???ms',
+    ogDesc: '反応速度テスト！5ラウンドの真剣勝負 ⚡',
+    twitterTitle: '反射神経テスト ⚡',
+    twitterDesc: '反応速度テスト！人間の平均より速い？遅い？',
+    shareCanvasTitle: '⚡ 反射神経テスト',
+    shareCanvasAvg: '平均反応時間',
+    shareCanvasFoul: 'フライング',
+    moreGames: '🎮 他のチャレンジ',
+    game1Name: 'ミリ秒チャレンジ',
+    game1Hook: 'SSSランクは0.01%だけ',
+    game2Name: '色覚テスト',
+    game2Hook: 'Level 25突破は2.1%だけ',
+    game3Name: '記憶力の限界',
+    game3Hook: '普通は7個。あなたは？',
+    earlyTaunts: ["お気持ちは分かりますが、まだですよ？","焦らないでくださいね...って言ったそばから","フライングとか、小学生の運動会ですか？","落ち着いて。深呼吸して。...はい、また早い","せっかちさんですね。嫌いじゃないですけど"],
+    roundTaunts: {
+      150: ["...人間をやめましたか？","お薬でも飲みました？正直に言って","通報しておきますね（褒め言葉）"],
+      180: ["プロゲーマーかな？すごいですね...本当に","あなたの神経、特急列車ですか","eスポーツの道、考えてみては？（真顔）"],
+      220: ["まあまあですね。褒めてますよ、一応","悪くないです。上位層です（小声）","なかなかやりますね"],
+      270: ["ごく普通の人間ですね。安心してください","平均的。平凡。普通。でも大丈夫","可もなく不可もなく...って言われたくないですよね"],
+      350: ["あの...起きてます？","お昼寝の直後ですか？","コーヒーをお持ちしましょうか"],
+      500: ["亀と競争したら...いい勝負かもしれません","おばあちゃんの方が速いかも。冗談です。...半分だけ","スマホ見てました？正直に"],
+      9999:["生存確認させてください","病院の受診をお勧めします（本気）","...寝落ちですか？"]
+    },
+    rankLabels: {
+      SSS: '上位0.01% — 人間超越',
+      SS: '上位0.1%',
+      S: '上位1%',
+      A: '上位5%',
+      B: '上位20%',
+      C: '上位50%',
+      D: '上位80%',
+      F: '脈拍の確認をお願いします'
+    },
+    ageCompare: [
+      [160, "あなたの反射神経は18歳のプロゲーマーより速い"],
+      [200, "あなたの反射神経は20歳の若者レベル"],
+      [240, "あなたの反射神経は25歳の成人レベル"],
+      [280, "あなたの反射神経は35歳の会社員レベル"],
+      [330, "あなたの反射神経は45歳の中年より少し遅い"],
+      [400, "あなたの反射神経は55歳の定年退職者レベル"],
+      [500, "あなたの反射神経は65歳のお年寄りより遅い"],
+      [9999, "あなたの反射神経は80歳以上...運動しましょう"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ 反射神経テスト結果\n\n🏅 ランク: ${rank}\n⏱️ 平均: ${avg}ms\n📊 ${label}\n\n${taunt}\n\n私より速い？👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'ko': {
+    title: '⚡ 반응속도 테스트',
+    subtitle: '당신의 반응속도는?',
+    statPlayers: '누적',
+    statPlayersSuffix: '명 테스트',
+    statAvg: '인간 평균 반응시간: <span>273ms</span>',
+    statRecord: '세계기록: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: '테스트 시작',
+    lbBtn: '🏆 랭킹',
+    waitMsg: '대기...',
+    roundPrefix: '',
+    roundSuffix: '라운드',
+    readyMsg: '터치!',
+    readySub: '지금!',
+    earlyMsg: '너무 빨라!',
+    tapHint: '터치하여 계속',
+    tapHint2: '터치하여 계속',
+    msLabel: '밀리초',
+    avgLabel: '평균 반응시간',
+    shareTitle: '결과 공유하기',
+    copyBtn: '📋 복사',
+    copiedBtn: '✅ 복사됨',
+    dlBtn: '📥 이미지 저장',
+    retryBtn: '다시 하기',
+    lbTitle: '🏆 랭킹 TOP 20',
+    closeBtn: '닫기',
+    lbLoading: '로딩중...',
+    lbEmpty: '아직 기록이 없습니다',
+    lbError: '로드 실패',
+    pbLabel: '개인 최고기록',
+    newPB: '🎉 새로운 개인 최고기록!',
+    roundLabel: (i) => `${i}라운드`,
+    foulText: '반칙 (+1000ms)',
+    roundInfo: (c, t) => `${c} / ${t} 라운드`,
+    percentileText: (pct) => `전체 플레이어의 ${pct}%를 이겼습니다`,
+    metaTitle: '반응속도 테스트 - 얼마나 빠르세요?',
+    metaDesc: '반응속도 테스트! 5라운드 도전, 프로게이머급인지 거북이급인지 확인하세요!',
+    ogTitle: '반응속도 테스트 - 내 반응속도는 ???ms',
+    ogDesc: '반응속도 테스트! 5라운드 진검승부 ⚡',
+    twitterTitle: '반응속도 테스트 ⚡',
+    twitterDesc: '반응속도 테스트! 인간 평균보다 빠르다? 느리다?',
+    shareCanvasTitle: '⚡ 반응속도 테스트',
+    shareCanvasAvg: '평균 반응시간',
+    shareCanvasFoul: '반칙',
+    moreGames: '🎮 더 많은 챌린지',
+    game1Name: '밀리초 챌린지',
+    game1Hook: 'SSS 등급은 0.01%만 가능',
+    game2Name: '색각 테스트',
+    game2Hook: 'Level 25 클리어는 2.1%만',
+    game3Name: '기억력 한계',
+    game3Hook: '보통 사람은 7개. 당신은?',
+    earlyTaunts: ["페이커도 이렇게 급하진 않았는데 ㅋㅋ","님 그거 반칙임 ㅋ 리플 안 봄?","이속도면 LOL 서렌 각","칼바람에서도 이러면 안됨","gg 반칙 ㅋㅋㅋ"],
+    roundTaunts: {
+      150: ["ㅋㅋㅋ 핵 쓰냐? 진짜로","님 페이커 아님? 솔직히 말해봐","이거 실화? 벤 각인데"],
+      180: ["프로게이머 뺨치는 반응속도 ㄷㄷ","T1 트라이아웃 가셔야 할 듯","님의 손가락은 기계입니까"],
+      220: ["쏠쏠한 반응속도 ㅎ","다이아 정도는 되겠네","나쁘지 않은데 ㅋ"],
+      270: ["평범한 실버 수준 ㅋ","딱 평균이시네요... 축하?","노말겜 하세요 그냥"],
+      350: ["님 방금 리플레이 봄? 느림 ㅋ","커피 한잔 하고 오셈","잠깐 자고 왔어요?"],
+      500: ["브론즈5 확정 ㄱㅋ","님 할머니가 더 빠를 듯 ㅋㅋ","핸드폰 다른 거 보고 있었죠"],
+      9999:["AFK인가요? ㅋㅋ","병원 가보세요 진심으로","님 잠듦? ㅋㅋㅋ"]
+    },
+    rankLabels: {
+      SSS: '상위 0.01% — 인간 초월',
+      SS: '상위 0.1%',
+      S: '상위 1%',
+      A: '상위 5%',
+      B: '상위 20%',
+      C: '상위 50%',
+      D: '상위 80%',
+      F: '맥박 확인 필요'
+    },
+    ageCompare: [
+      [160, "당신의 반응속도는 18세 프로게이머보다 빠릅니다"],
+      [200, "당신의 반응속도는 20세 청년 수준"],
+      [240, "당신의 반응속도는 25세 성인 수준"],
+      [280, "당신의 반응속도는 35세 직장인 수준"],
+      [330, "당신의 반응속도는 45세 중년보다 느립니다"],
+      [400, "당신의 반응속도는 55세 은퇴자 수준"],
+      [500, "당신의 반응속도는 65세 어르신보다 느립니다"],
+      [9999, "당신의 반응속도는 80세 이상... 운동하세요"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ 반응속도 테스트 결과\n\n🏅 등급: ${rank}\n⏱️ 평균: ${avg}ms\n📊 ${label}\n\n${taunt}\n\n나보다 빠를 수 있어? 👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'es': {
+    title: '⚡ Test de Reflejos',
+    subtitle: '¿Qué tan rápidos son tus reflejos?',
+    statPlayers: '',
+    statPlayersSuffix: 'personas lo han probado',
+    statAvg: 'Promedio humano: <span>273ms</span>',
+    statRecord: 'Récord mundial: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: '¡Empezar!',
+    lbBtn: '🏆 Ranking',
+    waitMsg: 'Espera...',
+    roundPrefix: 'Ronda',
+    roundSuffix: '',
+    readyMsg: '¡TOCA!',
+    readySub: '¡AHORA!',
+    earlyMsg: '¡Muy pronto!',
+    tapHint: 'Toca para continuar',
+    tapHint2: 'Toca para continuar',
+    msLabel: 'milisegundos',
+    avgLabel: 'Tiempo de Reacción Promedio',
+    shareTitle: 'Comparte tu resultado',
+    copyBtn: '📋 Copiar',
+    copiedBtn: '✅ Copiado',
+    dlBtn: '📥 Descargar imagen',
+    retryBtn: '¡Otra vez!',
+    lbTitle: '🏆 Ranking TOP 20',
+    closeBtn: 'Cerrar',
+    lbLoading: 'Cargando...',
+    lbEmpty: 'Aún no hay registros',
+    lbError: 'Error al cargar',
+    pbLabel: 'Mejor personal',
+    newPB: '🎉 ¡Nuevo récord personal!',
+    roundLabel: (i) => `Ronda ${i}`,
+    foulText: 'Falta (+1000ms)',
+    roundInfo: (c, t) => `Ronda ${c} / ${t}`,
+    percentileText: (pct) => `Superaste al ${pct}% de los jugadores`,
+    metaTitle: 'Test de Reflejos - ¿Qué tan rápido eres?',
+    metaDesc: '¡Pon a prueba tus reflejos! 5 rondas para saber si eres nivel pro o nivel tortuga.',
+    ogTitle: 'Test de Reflejos - Mi velocidad es ???ms',
+    ogDesc: '¡Pon a prueba tus reflejos! 5 rondas de pura adrenalina ⚡',
+    twitterTitle: 'Test de Reflejos ⚡',
+    twitterDesc: '¡Test de reflejos! ¿Eres más rápido que el promedio humano?',
+    shareCanvasTitle: '⚡ Test de Reflejos',
+    shareCanvasAvg: 'Tiempo de Reacción Promedio',
+    shareCanvasFoul: 'Falta',
+    moreGames: '🎮 Más Desafíos',
+    game1Name: 'Desafío del Milisegundo',
+    game1Hook: 'Solo el 0.01% obtiene SSS',
+    game2Name: 'Test de Color',
+    game2Hook: 'Solo el 2.1% pasa el Nivel 25',
+    game3Name: 'Límite de Memoria',
+    game3Hook: 'Lo normal es 7. ¿Y tú?',
+    earlyTaunts: ["¡¡¡CÁLMATE!!! Aún no era verde","¡Dios mío, qué ansiedad!","¿Siempre eres tan impaciente en la vida?","¡Tranquilo guerrero! Espera la señal","¡Se nota que no aguantas la presión! 😂"],
+    roundTaunts: {
+      150: ["¡¡¡IMPOSIBLE!!! ¿Eres humano siquiera?","¡MADRE MÍA! Eso es sobrenatural","¡Llamen a la NASA, encontramos un alien! 👽"],
+      180: ["¡BRUTAL! Nivel de jugador profesional","¡Tus reflejos son de OTRO MUNDO!","¡Eso es velocidad PURA! 🔥🔥🔥"],
+      220: ["¡Nada mal! Tienes buenos reflejos","¡Mejor que la mayoría! Respeto 💪","Nivel alto, sigue así"],
+      270: ["Promedio... como tu ex 😏","Normal. Ni fu ni fa","Eres del montón, pero con cariño"],
+      350: ["¿Estabas durmiendo o qué? 😴","¿Necesitas un cafecito?","Ayyy... eso fue lento, amigo"],
+      500: ["¡JAJAJA nivel tortuga! 🐢","Tu abuela reacciona más rápido","¿Estabas viendo el celular? Confiesa"],
+      9999:["¿Sigues vivo? Pregunta seria","Recomiendo ir al médico YA","...¿te dormiste? 😂😂😂"]
+    },
+    rankLabels: {
+      SSS: 'Top 0.01% — Sobrehumano',
+      SS: 'Top 0.1%',
+      S: 'Top 1%',
+      A: 'Top 5%',
+      B: 'Top 20%',
+      C: 'Top 50%',
+      D: 'Top 80%',
+      F: 'Confirma que tienes pulso'
+    },
+    ageCompare: [
+      [160, "Tus reflejos superan a un pro-gamer de 18 años"],
+      [200, "Tus reflejos son de un joven de 20 años"],
+      [240, "Tus reflejos son de un adulto de 25 años"],
+      [280, "Tus reflejos son de un oficinista de 35 años"],
+      [330, "Tus reflejos son más lentos que alguien de 45"],
+      [400, "Tus reflejos son de un jubilado de 55 años"],
+      [500, "Tus reflejos son más lentos que alguien de 65"],
+      [9999, "Tus reflejos son de 80+ años... haz ejercicio"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ Test de Reflejos\n\n🏅 Rango: ${rank}\n⏱️ Promedio: ${avg}ms\n📊 ${label}\n\n${taunt}\n\n¿Puedes ganarme? 👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'pt': {
+    title: '⚡ Teste de Reflexo',
+    subtitle: 'Quão rápido você é?',
+    statPlayers: '',
+    statPlayersSuffix: 'pessoas testaram',
+    statAvg: 'Média humana: <span>273ms</span>',
+    statRecord: 'Recorde mundial: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: 'Começar!',
+    lbBtn: '🏆 Ranking',
+    waitMsg: 'Espera...',
+    roundPrefix: 'Rodada',
+    roundSuffix: '',
+    readyMsg: 'APERTA!',
+    readySub: 'AGORA!',
+    earlyMsg: 'Cedo demais!',
+    tapHint: 'Toque para continuar',
+    tapHint2: 'Toque para continuar',
+    msLabel: 'milissegundos',
+    avgLabel: 'Tempo de Reação Médio',
+    shareTitle: 'Compartilhe seu resultado',
+    copyBtn: '📋 Copiar',
+    copiedBtn: '✅ Copiado',
+    dlBtn: '📥 Baixar imagem',
+    retryBtn: 'De novo!',
+    lbTitle: '🏆 Ranking TOP 20',
+    closeBtn: 'Fechar',
+    lbLoading: 'Carregando...',
+    lbEmpty: 'Nenhum registro ainda',
+    lbError: 'Falha ao carregar',
+    pbLabel: 'Recorde pessoal',
+    newPB: '🎉 Novo recorde pessoal!',
+    roundLabel: (i) => `Rodada ${i}`,
+    foulText: 'Queimou (+1000ms)',
+    roundInfo: (c, t) => `Rodada ${c} / ${t}`,
+    percentileText: (pct) => `Você venceu ${pct}% dos jogadores`,
+    metaTitle: 'Teste de Reflexo - Quão rápido você é?',
+    metaDesc: 'Teste seu reflexo! 5 rodadas pra saber se você é nível pro ou nível tartaruga.',
+    ogTitle: 'Teste de Reflexo - Meu tempo é ???ms',
+    ogDesc: 'Teste seu reflexo! 5 rodadas de pura adrenalina ⚡',
+    twitterTitle: 'Teste de Reflexo ⚡',
+    twitterDesc: 'Teste de reflexo! Você é mais rápido que a média humana?',
+    shareCanvasTitle: '⚡ Teste de Reflexo',
+    shareCanvasAvg: 'Tempo de Reação Médio',
+    shareCanvasFoul: 'Queimou',
+    moreGames: '🎮 Mais Desafios',
+    game1Name: 'Desafio do Milissegundo',
+    game1Hook: 'Só 0.01% chega no SSS',
+    game2Name: 'Teste de Cores',
+    game2Hook: 'Só 2.1% passa do Level 25',
+    game3Name: 'Limite de Memória',
+    game3Hook: 'Normal é 7. E você?',
+    earlyTaunts: ["CALMA CALABRESO kkkk","Ansiedade tá braba hein","Cê queimou a largada mano kkk","Respira, conta até 3... ah esquece","Nem o Neymar simula tão rápido 😂"],
+    roundTaunts: {
+      150: ["CARALH* QUE ISSO MANO???","Cê é um robô? Fala sério kkkk","Isso não é humano bicho 🤖"],
+      180: ["Reflexo de jogador profissional mano!","Teus neurônios são feitos de fibra óptica","Bora pro campeonato! 🔥"],
+      220: ["Bonitinho esse reflexo hein","Melhor que a maioria, tá safe","Mandou bem, tá no lucro"],
+      270: ["Mediano. Tipo coxinha de padaria","Normal... como seu signo kkkk","Tá na média, vida que segue"],
+      350: ["Tava dormindo né kkk","Bora tomar um café?","Lento que nem fila do SUS"],
+      500: ["KKKKK reflexo de tartaruga 🐢","Minha vó de 90 anos ganha de você","Tava no zap né? Confessa"],
+      9999:["Cê tá vivo? Pergunta séria kkk","Vai no médico pfvr","Dormiu? Capotou? kkkk"]
+    },
+    rankLabels: {
+      SSS: 'Top 0.01% — Sobre-humano',
+      SS: 'Top 0.1%',
+      S: 'Top 1%',
+      A: 'Top 5%',
+      B: 'Top 20%',
+      C: 'Top 50%',
+      D: 'Top 80%',
+      F: 'Confere se tá com pulso'
+    },
+    ageCompare: [
+      [160, "Seu reflexo é melhor que um pro-gamer de 18 anos"],
+      [200, "Seu reflexo é de um jovem de 20 anos"],
+      [240, "Seu reflexo é de um adulto de 25 anos"],
+      [280, "Seu reflexo é de um trabalhador de 35 anos"],
+      [330, "Seu reflexo é mais lento que alguém de 45"],
+      [400, "Seu reflexo é de um aposentado de 55 anos"],
+      [500, "Seu reflexo é mais lento que alguém de 65"],
+      [9999, "Seu reflexo é de 80+ anos... bora se exercitar"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ Teste de Reflexo\n\n🏅 Rank: ${rank}\n⏱️ Média: ${avg}ms\n📊 ${label}\n\n${taunt}\n\nBora ver se tu me ganha 👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'de': {
+    title: '⚡ Reaktionstest',
+    subtitle: 'Wie schnell reagierst du?',
+    statPlayers: '',
+    statPlayersSuffix: 'Personen getestet',
+    statAvg: 'Menschlicher Durchschnitt: <span>273ms</span>',
+    statRecord: 'Weltrekord: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: 'Test starten',
+    lbBtn: '🏆 Bestenliste',
+    waitMsg: 'Warten...',
+    roundPrefix: 'Runde',
+    roundSuffix: '',
+    readyMsg: 'TIPPEN!',
+    readySub: 'JETZT!',
+    earlyMsg: 'Zu früh!',
+    tapHint: 'Tippen zum Fortfahren',
+    tapHint2: 'Tippen zum Fortfahren',
+    msLabel: 'Millisekunden',
+    avgLabel: 'Durchschnittliche Reaktionszeit',
+    shareTitle: 'Ergebnis teilen',
+    copyBtn: '📋 Kopieren',
+    copiedBtn: '✅ Kopiert',
+    dlBtn: '📥 Bild speichern',
+    retryBtn: 'Nochmal',
+    lbTitle: '🏆 Bestenliste TOP 20',
+    closeBtn: 'Schließen',
+    lbLoading: 'Laden...',
+    lbEmpty: 'Noch keine Einträge',
+    lbError: 'Laden fehlgeschlagen',
+    pbLabel: 'Persönlicher Rekord',
+    newPB: '🎉 Neuer persönlicher Rekord!',
+    roundLabel: (i) => `Runde ${i}`,
+    foulText: 'Fehlstart (+1000ms)',
+    roundInfo: (c, t) => `Runde ${c} / ${t}`,
+    percentileText: (pct) => `Du bist besser als ${pct}% aller Spieler`,
+    metaTitle: 'Reaktionstest - Wie schnell bist du?',
+    metaDesc: 'Teste deine Reaktionszeit! 5 Runden, finde heraus ob du Pro-Gamer oder Schildkröte bist.',
+    ogTitle: 'Reaktionstest - Meine Reaktionszeit ist ???ms',
+    ogDesc: 'Teste deine Reaktionszeit! 5 Runden pure Reflexe ⚡',
+    twitterTitle: 'Reaktionstest ⚡',
+    twitterDesc: 'Reaktionstest! Bist du schneller als der Durchschnitt?',
+    shareCanvasTitle: '⚡ Reaktionstest',
+    shareCanvasAvg: 'Durchschnittliche Reaktionszeit',
+    shareCanvasFoul: 'Fehlstart',
+    moreGames: '🎮 Mehr Herausforderungen',
+    game1Name: 'Millisekunden-Challenge',
+    game1Hook: 'Nur 0,01% schaffen SSS',
+    game2Name: 'Farbsinn-Test',
+    game2Hook: 'Nur 2,1% schaffen Level 25',
+    game3Name: 'Gedächtnis-Limit',
+    game3Hook: 'Normal sind 7. Und du?',
+    earlyTaunts: ["Zu früh. Überraschend? Nein.","Geduld ist eine Tugend. Nicht deine, offensichtlich.","Das war ein Fehlstart. Passiert den Besten. Dir auch.","Ruhig. Atmen. Warten. Dann drücken. In dieser Reihenfolge.","Disziplin: mangelhaft."],
+    roundTaunts: {
+      150: ["Statistisch unwahrscheinlich. Verdächtig.","Entweder Betrug oder ein neurologisches Wunder.","Die Physik hat Fragen an dich."],
+      180: ["Respektabel. Professionelles Niveau.","Deine Synapsen funktionieren einwandfrei.","Das war... tatsächlich beeindruckend."],
+      220: ["Solide. Nicht spektakulär, aber solide.","Überdurchschnittlich. Darf man erwähnen.","Ordentlich. Mehr gibt es dazu nicht zu sagen."],
+      270: ["Exakt durchschnittlich. Wie bestellt.","Mittelmäßigkeit hat auch ihren Reiz. Angeblich.","Normal. So normal wie möglich."],
+      350: ["Das war... gemütlich.","Kaffee wäre vielleicht angebracht.","Nicht eilig heute, oder?"],
+      500: ["Eine Schildkröte hätte gewonnen. Faktencheck: bestanden.","Deine Oma wäre möglicherweise schneller. Hypothetisch.","Das war bemerkenswert langsam. Bemerkenswert."],
+      9999:["Lebenszeichen erbeten.","Ärztliche Konsultation empfohlen. Ernst gemeint.","...eingeschlafen? Rhetorische Frage."]
+    },
+    rankLabels: {
+      SSS: 'Top 0,01% — Übermenschlich',
+      SS: 'Top 0,1%',
+      S: 'Top 1%',
+      A: 'Top 5%',
+      B: 'Top 20%',
+      C: 'Top 50%',
+      D: 'Top 80%',
+      F: 'Bitte Puls überprüfen'
+    },
+    ageCompare: [
+      [160, "Deine Reflexe schlagen einen 18-jährigen Pro-Gamer"],
+      [200, "Deine Reflexe entsprechen einem 20-Jährigen"],
+      [240, "Deine Reflexe entsprechen einem 25-Jährigen"],
+      [280, "Deine Reflexe entsprechen einem 35-jährigen Büroangestellten"],
+      [330, "Deine Reflexe sind langsamer als bei einem 45-Jährigen"],
+      [400, "Deine Reflexe entsprechen einem 55-jährigen Rentner"],
+      [500, "Deine Reflexe sind langsamer als bei einem 65-Jährigen"],
+      [9999, "Deine Reflexe sind über 80... mehr Bewegung empfohlen"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ Reaktionstest\n\n🏅 Rang: ${rank}\n⏱️ Durchschnitt: ${avg}ms\n📊 ${label}\n\n${taunt}\n\nKannst du mich schlagen? 👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'fr': {
+    title: '⚡ Test de Réflexes',
+    subtitle: 'Quelle est ta vitesse de réaction?',
+    statPlayers: '',
+    statPlayersSuffix: 'personnes ont testé',
+    statAvg: 'Moyenne humaine: <span>273ms</span>',
+    statRecord: 'Record mondial: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: 'Commencer',
+    lbBtn: '🏆 Classement',
+    waitMsg: 'Attends...',
+    roundPrefix: 'Manche',
+    roundSuffix: '',
+    readyMsg: 'APPUIE!',
+    readySub: 'MAINTENANT!',
+    earlyMsg: 'Trop tôt!',
+    tapHint: 'Appuie pour continuer',
+    tapHint2: 'Appuie pour continuer',
+    msLabel: 'millisecondes',
+    avgLabel: 'Temps de Réaction Moyen',
+    shareTitle: 'Partage ton résultat',
+    copyBtn: '📋 Copier',
+    copiedBtn: '✅ Copié',
+    dlBtn: '📥 Télécharger',
+    retryBtn: 'Recommencer',
+    lbTitle: '🏆 Classement TOP 20',
+    closeBtn: 'Fermer',
+    lbLoading: 'Chargement...',
+    lbEmpty: 'Aucun record pour le moment',
+    lbError: 'Échec du chargement',
+    pbLabel: 'Record personnel',
+    newPB: '🎉 Nouveau record personnel!',
+    roundLabel: (i) => `Manche ${i}`,
+    foulText: 'Faux départ (+1000ms)',
+    roundInfo: (c, t) => `Manche ${c} / ${t}`,
+    percentileText: (pct) => `Tu as battu ${pct}% des joueurs`,
+    metaTitle: 'Test de Réflexes - Quelle est ta vitesse?',
+    metaDesc: 'Teste tes réflexes! 5 manches pour savoir si tu es niveau pro ou niveau tortue.',
+    ogTitle: 'Test de Réflexes - Mon temps est ???ms',
+    ogDesc: 'Teste tes réflexes! 5 manches d\'adrénaline pure ⚡',
+    twitterTitle: 'Test de Réflexes ⚡',
+    twitterDesc: 'Test de réflexes! Es-tu plus rapide que la moyenne?',
+    shareCanvasTitle: '⚡ Test de Réflexes',
+    shareCanvasAvg: 'Temps de Réaction Moyen',
+    shareCanvasFoul: 'Faux départ',
+    moreGames: '🎮 Plus de Défis',
+    game1Name: 'Défi Milliseconde',
+    game1Hook: 'Seuls 0,01% obtiennent SSS',
+    game2Name: 'Test de Couleurs',
+    game2Hook: 'Seuls 2,1% passent le Level 25',
+    game3Name: 'Limite de Mémoire',
+    game3Hook: 'La norme est 7. Et toi?',
+    earlyTaunts: ["Trop tôt, mon cher. Un peu de tenue.","L'impatience est un défaut... que tu maîtrises parfaitement.","On ne t'a jamais appris à attendre? Comme c'est... populaire.","Faux départ. Quelle surprise. Aucune, en fait.","La précipitation est l'ennemie de l'élégance."],
+    roundTaunts: {
+      150: ["Impossible. Tu triches, n'est-ce pas? Avoue.","C'est... statistiquement improbable. Je suis impressionné malgré moi.","Tu es soit un robot, soit un génie. Dans les deux cas, bravo."],
+      180: ["Réflexes de professionnel. Distingué.","Tes synapses ont étudié dans les grandes écoles.","Remarquable. Et je ne dis pas ça à tout le monde."],
+      220: ["Pas mal du tout. Au-dessus de la mêlée.","Correct. Mieux que correct, même.","Tu te débrouilles plutôt bien, il faut l'admettre."],
+      270: ["Parfaitement moyen. C'est presque un art.","La médiocrité dorée, comme disaient les anciens. Non, ils ne disaient pas ça.","Banal, mais avec charme."],
+      350: ["C'était... contemplatif.","Tu as pris le temps d'apprécier la vie, c'est ça?","Un petit café serait peut-être de circonstance."],
+      500: ["Oh là là. Une tortue aurait fait mieux, et avec plus de grâce.","Ta grand-mère serait peut-être plus véloce. Je dis ça, je dis rien.","C'était remarquablement lent. Remarquablement."],
+      9999:["Tu es encore parmi nous? Une confirmation serait appréciée.","Consultation médicale recommandée. Sincèrement.","...Tu t'es endormi? Question rhétorique. Ou pas."]
+    },
+    rankLabels: {
+      SSS: 'Top 0,01% — Surhumain',
+      SS: 'Top 0,1%',
+      S: 'Top 1%',
+      A: 'Top 5%',
+      B: 'Top 20%',
+      C: 'Top 50%',
+      D: 'Top 80%',
+      F: 'Vérifie ton pouls, s\'il te plaît'
+    },
+    ageCompare: [
+      [160, "Tes réflexes battent un pro-gamer de 18 ans"],
+      [200, "Tes réflexes sont ceux d'un jeune de 20 ans"],
+      [240, "Tes réflexes sont ceux d'un adulte de 25 ans"],
+      [280, "Tes réflexes sont ceux d'un employé de 35 ans"],
+      [330, "Tes réflexes sont plus lents qu'une personne de 45 ans"],
+      [400, "Tes réflexes sont ceux d'un retraité de 55 ans"],
+      [500, "Tes réflexes sont plus lents qu'une personne de 65 ans"],
+      [9999, "Tes réflexes dépassent 80 ans... fais du sport"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ Test de Réflexes\n\n🏅 Rang: ${rank}\n⏱️ Moyenne: ${avg}ms\n📊 ${label}\n\n${taunt}\n\nTu peux faire mieux? 👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'th': {
+    title: '⚡ ทดสอบปฏิกิริยา',
+    subtitle: 'คุณเร็วแค่ไหน?',
+    statPlayers: 'รวม',
+    statPlayersSuffix: 'คนทดสอบแล้ว',
+    statAvg: 'ค่าเฉลี่ยมนุษย์: <span>273ms</span>',
+    statRecord: 'สถิติโลก: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: 'เริ่มทดสอบ',
+    lbBtn: '🏆 อันดับ',
+    waitMsg: 'รอ...',
+    roundPrefix: 'รอบที่',
+    roundSuffix: '',
+    readyMsg: 'กด!',
+    readySub: 'เร็ว!',
+    earlyMsg: 'เร็วไป!',
+    tapHint: 'แตะเพื่อดำเนินต่อ',
+    tapHint2: 'แตะเพื่อดำเนินต่อ',
+    msLabel: 'มิลลิวินาที',
+    avgLabel: 'เวลาปฏิกิริยาเฉลี่ย',
+    shareTitle: 'แชร์ผลลัพธ์',
+    copyBtn: '📋 คัดลอก',
+    copiedBtn: '✅ คัดลอกแล้ว',
+    dlBtn: '📥 ดาวน์โหลดรูป',
+    retryBtn: 'ลองอีกครั้ง',
+    lbTitle: '🏆 อันดับ TOP 20',
+    closeBtn: 'ปิด',
+    lbLoading: 'กำลังโหลด...',
+    lbEmpty: 'ยังไม่มีสถิติ',
+    lbError: 'โหลดไม่ได้',
+    pbLabel: 'สถิติส่วนตัว',
+    newPB: '🎉 สถิติใหม่!',
+    roundLabel: (i) => `รอบที่ ${i}`,
+    foulText: 'ฟาวล์ (+1000ms)',
+    roundInfo: (c, t) => `รอบที่ ${c} / ${t}`,
+    percentileText: (pct) => `คุณเร็วกว่า ${pct}% ของผู้เล่นทั้งหมด`,
+    metaTitle: 'ทดสอบปฏิกิริยา - คุณเร็วแค่ไหน?',
+    metaDesc: 'ทดสอบความเร็วปฏิกิริยา! 5 รอบ ดูว่าคุณเป็นระดับโปรหรือระดับเต่า',
+    ogTitle: 'ทดสอบปฏิกิริยา - เวลาของฉัน ???ms',
+    ogDesc: 'ทดสอบปฏิกิริยา! 5 รอบแห่งความตื่นเต้น ⚡',
+    twitterTitle: 'ทดสอบปฏิกิริยา ⚡',
+    twitterDesc: 'ทดสอบปฏิกิริยา! คุณเร็วกว่าค่าเฉลี่ยมนุษย์ไหม?',
+    shareCanvasTitle: '⚡ ทดสอบปฏิกิริยา',
+    shareCanvasAvg: 'เวลาปฏิกิริยาเฉลี่ย',
+    shareCanvasFoul: 'ฟาวล์',
+    moreGames: '🎮 ความท้าทายเพิ่มเติม',
+    game1Name: 'มิลลิวินาที แชลเลนจ์',
+    game1Hook: 'แค่ 0.01% ได้ SSS',
+    game2Name: 'ทดสอบสี',
+    game2Hook: 'แค่ 2.1% ผ่าน Level 25',
+    game3Name: 'ขีดจำกัดความจำ',
+    game3Hook: 'คนทั่วไปจำได้ 7 คุณล่ะ?',
+    earlyTaunts: ["ใจเย็นๆ ยังไม่เขียวเลยจ้า 555","ร้อนรนขนาดนี้เลยเหรอ 😂","เร็วไปจ้า~ รอเขียวก่อนสิ","อย่าใจร้อน นับ 1-2-3 ก่อนน๊า","ฟาวล์! มือไวกว่าสมองแล้วจ้า 555"],
+    roundTaunts: {
+      150: ["เร็วเวอร์! คุณเป็นหุ่นยนต์ป่ะ 🤖","ไม่น่าเชื่อ! ระดับเทพเลย","นี่โกงรึเปล่าเนี่ย 555"],
+      180: ["เร็วมากจ้า! นักกีฬาอีสปอร์ตเลย 🔥","นิ้วไวมากกก","สุดยอดเลยจริงๆ"],
+      220: ["ดีเลยนะ ไม่เลว~","เหนือค่าเฉลี่ย เก่งจัง","โอเคเลยจ้า ผ่าน! 👍"],
+      270: ["ก็... ธรรมดาน่ะจ้า 555","ระดับคนทั่วไป ไม่ต้องซีเรียส","พอใช้ได้จ้า เอาน่า"],
+      350: ["เพิ่งตื่นนอนเหรอจ้า 😴","ช้าไปหน่อยนะ ต้องการกาแฟไหม","อืม... ไม่ค่อยเร็วเท่าไหร่นะ"],
+      500: ["เต่าน้อย มาแล้วจ้า 🐢 555","ยายยังเร็วกว่าอีก 555","เล่นมือถืออยู่สิ สารภาพมา~"],
+      9999:["ยังมีลมหายใจอยู่ป่ะ 555","แนะนำไปหาหมอจ้า (พูดจริงนะ)","หลับไปเลยเหรอจ้า 😂"]
+    },
+    rankLabels: {
+      SSS: 'Top 0.01% — เหนือมนุษย์',
+      SS: 'Top 0.1%',
+      S: 'Top 1%',
+      A: 'Top 5%',
+      B: 'Top 20%',
+      C: 'Top 50%',
+      D: 'Top 80%',
+      F: 'เช็คชีพจรหน่อยจ้า'
+    },
+    ageCompare: [
+      [160, "ปฏิกิริยาเร็วกว่านักอีสปอร์ตอายุ 18"],
+      [200, "ปฏิกิริยาเท่ากับคนอายุ 20"],
+      [240, "ปฏิกิริยาเท่ากับคนอายุ 25"],
+      [280, "ปฏิกิริยาเท่ากับพนักงานออฟฟิศอายุ 35"],
+      [330, "ปฏิกิริยาช้ากว่าคนอายุ 45 นิดหน่อย"],
+      [400, "ปฏิกิริยาเท่ากับผู้เกษียณอายุ 55"],
+      [500, "ปฏิกิริยาช้ากว่าผู้สูงอายุ 65"],
+      [9999, "ปฏิกิริยาช้ากว่าคนอายุ 80+... ออกกำลังกายบ้างนะ"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ ทดสอบปฏิกิริยา\n\n🏅 อันดับ: ${rank}\n⏱️ เฉลี่ย: ${avg}ms\n📊 ${label}\n\n${taunt}\n\nเร็วกว่าเราไหม? 👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'id': {
+    title: '⚡ Tes Reaksi',
+    subtitle: 'Seberapa cepat reaksimu?',
+    statPlayers: '',
+    statPlayersSuffix: 'orang sudah tes',
+    statAvg: 'Rata-rata manusia: <span>273ms</span>',
+    statRecord: 'Rekor dunia: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: 'Mulai Tes',
+    lbBtn: '🏆 Peringkat',
+    waitMsg: 'Tunggu...',
+    roundPrefix: 'Ronde',
+    roundSuffix: '',
+    readyMsg: 'TEKAN!',
+    readySub: 'SEKARANG!',
+    earlyMsg: 'Kecepetan!',
+    tapHint: 'Ketuk untuk lanjut',
+    tapHint2: 'Ketuk untuk lanjut',
+    msLabel: 'milidetik',
+    avgLabel: 'Waktu Reaksi Rata-rata',
+    shareTitle: 'Bagikan Hasilmu',
+    copyBtn: '📋 Salin',
+    copiedBtn: '✅ Tersalin',
+    dlBtn: '📥 Unduh Gambar',
+    retryBtn: 'Coba Lagi',
+    lbTitle: '🏆 Peringkat TOP 20',
+    closeBtn: 'Tutup',
+    lbLoading: 'Memuat...',
+    lbEmpty: 'Belum ada rekor',
+    lbError: 'Gagal memuat',
+    pbLabel: 'Rekor pribadi',
+    newPB: '🎉 Rekor pribadi baru!',
+    roundLabel: (i) => `Ronde ${i}`,
+    foulText: 'Pelanggaran (+1000ms)',
+    roundInfo: (c, t) => `Ronde ${c} / ${t}`,
+    percentileText: (pct) => `Kamu mengalahkan ${pct}% dari semua pemain`,
+    metaTitle: 'Tes Reaksi - Seberapa Cepat Kamu?',
+    metaDesc: 'Tes kecepatan reaksi! 5 ronde, cari tau kamu level pro atau level kura-kura wkwk',
+    ogTitle: 'Tes Reaksi - Kecepatanku ???ms',
+    ogDesc: 'Tes kecepatan reaksi! 5 ronde seru ⚡',
+    twitterTitle: 'Tes Reaksi ⚡',
+    twitterDesc: 'Tes reaksi! Kamu lebih cepat dari rata-rata manusia?',
+    shareCanvasTitle: '⚡ Tes Reaksi',
+    shareCanvasAvg: 'Waktu Reaksi Rata-rata',
+    shareCanvasFoul: 'Pelanggaran',
+    moreGames: '🎮 Tantangan Lainnya',
+    game1Name: 'Tantangan Milidetik',
+    game1Hook: 'Cuma 0.01% dapet SSS',
+    game2Name: 'Tes Warna',
+    game2Hook: 'Cuma 2.1% lolos Level 25',
+    game3Name: 'Batas Memori',
+    game3Hook: 'Orang biasa ingat 7. Kamu?',
+    earlyTaunts: ["Kecepetan wkwk sabar dulu dong","Yaudah gasabar ya wkwkwk","Belum ijo udah pencet aja 😂","Santai bro, tarik napas dulu","Pelanggaran! Jarimu lebih cepet dari otakmu wkwk"],
+    roundTaunts: {
+      150: ["HAH?! Kamu robot ya wkwkwk 🤖","Ga mungkin ini manusia deh","Ini pake cheat ya? Ngaku aja wkwk"],
+      180: ["Gilaa cepet banget! Level pro 🔥","Saraf kamu terbuat dari fiber optik kali","Mantap jiwa! Bisa jadi atlet esports"],
+      220: ["Lumayan lah ya, di atas rata-rata","Ga jelek sih, oke lah 👍","Boleh juga nih, agak cepet"],
+      270: ["Standar manusia biasa wkwk","Rata-rata banget... ya gapapa sih","Biasa aja, tapi gapapa wkwk"],
+      350: ["Baru bangun tidur ya? 😴","Butuh kopi kayaknya nih wkwk","Agak lemot nih bro..."],
+      500: ["WKWKWK level kura-kura 🐢","Nenek gue mungkin lebih cepet","Lagi main HP ya? Ngaku wkwk"],
+      9999:["Masih hidup ga? Serius nanya wkwk","Ke dokter deh bro, serius","Ketiduran ya? wkwkwk"]
+    },
+    rankLabels: {
+      SSS: 'Top 0.01% — Bukan Manusia',
+      SS: 'Top 0.1%',
+      S: 'Top 1%',
+      A: 'Top 5%',
+      B: 'Top 20%',
+      C: 'Top 50%',
+      D: 'Top 80%',
+      F: 'Cek nadi dulu deh'
+    },
+    ageCompare: [
+      [160, "Reaksimu lebih cepat dari pro gamer umur 18"],
+      [200, "Reaksimu setara anak muda umur 20"],
+      [240, "Reaksimu setara orang dewasa umur 25"],
+      [280, "Reaksimu setara karyawan kantoran umur 35"],
+      [330, "Reaksimu lebih lambat dari orang umur 45"],
+      [400, "Reaksimu setara pensiunan umur 55"],
+      [500, "Reaksimu lebih lambat dari orang umur 65"],
+      [9999, "Reaksimu di atas 80 tahun... olahraga dong"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ Tes Reaksi\n\n🏅 Rank: ${rank}\n⏱️ Rata-rata: ${avg}ms\n📊 ${label}\n\n${taunt}\n\nBisa ngalahin gue ga? 👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  },
+  'vi': {
+    title: '⚡ Kiểm Tra Phản Xạ',
+    subtitle: 'Bạn nhanh cỡ nào?',
+    statPlayers: '',
+    statPlayersSuffix: 'người đã thử',
+    statAvg: 'Trung bình con người: <span>273ms</span>',
+    statRecord: 'Kỷ lục thế giới: <span>121ms</span> (🇰🇷 FlashKim)',
+    startBtn: 'Bắt đầu',
+    lbBtn: '🏆 Bảng xếp hạng',
+    waitMsg: 'Đợi...',
+    roundPrefix: 'Vòng',
+    roundSuffix: '',
+    readyMsg: 'BẤM!',
+    readySub: 'NGAY!',
+    earlyMsg: 'Sớm quá!',
+    tapHint: 'Chạm để tiếp tục',
+    tapHint2: 'Chạm để tiếp tục',
+    msLabel: 'mili giây',
+    avgLabel: 'Thời Gian Phản Xạ Trung Bình',
+    shareTitle: 'Chia sẻ kết quả',
+    copyBtn: '📋 Sao chép',
+    copiedBtn: '✅ Đã sao chép',
+    dlBtn: '📥 Tải ảnh',
+    retryBtn: 'Thử lại',
+    lbTitle: '🏆 Bảng Xếp Hạng TOP 20',
+    closeBtn: 'Đóng',
+    lbLoading: 'Đang tải...',
+    lbEmpty: 'Chưa có kỷ lục nào',
+    lbError: 'Không tải được',
+    pbLabel: 'Kỷ lục cá nhân',
+    newPB: '🎉 Kỷ lục cá nhân mới!',
+    roundLabel: (i) => `Vòng ${i}`,
+    foulText: 'Phạm lỗi (+1000ms)',
+    roundInfo: (c, t) => `Vòng ${c} / ${t}`,
+    percentileText: (pct) => `Bạn nhanh hơn ${pct}% người chơi`,
+    metaTitle: 'Kiểm Tra Phản Xạ - Bạn Nhanh Cỡ Nào?',
+    metaDesc: 'Test phản xạ! 5 vòng, xem bạn level pro hay level rùa!',
+    ogTitle: 'Kiểm Tra Phản Xạ - Tốc độ của tôi ???ms',
+    ogDesc: 'Test phản xạ! 5 vòng kịch tính ⚡',
+    twitterTitle: 'Kiểm Tra Phản Xạ ⚡',
+    twitterDesc: 'Test phản xạ! Bạn nhanh hơn trung bình không?',
+    shareCanvasTitle: '⚡ Kiểm Tra Phản Xạ',
+    shareCanvasAvg: 'Thời Gian Phản Xạ Trung Bình',
+    shareCanvasFoul: 'Phạm lỗi',
+    moreGames: '🎮 Thử Thách Khác',
+    game1Name: 'Thử Thách Mili Giây',
+    game1Hook: 'Chỉ 0.01% đạt SSS',
+    game2Name: 'Trắc Nghiệm Màu Sắc',
+    game2Hook: 'Chỉ 2.1% qua Level 25',
+    game3Name: 'Giới Hạn Trí Nhớ',
+    game3Hook: 'Người thường nhớ 7. Còn bạn?',
+    earlyTaunts: ["Nóng vội quá bạn ơi 😂","Chưa xanh mà đã bấm rồi kìa","Bình tĩnh nào, hít thở sâu đi","Phạm lỗi rồi! Tay nhanh hơn não luôn","Từ từ thôi, đây không phải thi chạy 100m 😄"],
+    roundTaunts: {
+      150: ["Ủa bạn là robot hả??? 🤖","Không thể nào! Nhanh vl luôn","Hack à? Nói thật đi 😂"],
+      180: ["Phản xạ cấp pro gamer đó! 🔥","Thần kinh bạn làm bằng cáp quang à","Đỉnh thật sự! Tuyển thủ esports chắc luôn"],
+      220: ["Khá lắm! Trên trung bình đó","Được đấy, không tệ~","Ổn áp, thuộc top trên rồi 👍"],
+      270: ["Bình thường thôi bạn ơi 😅","Trung bình y chang... congratulations?","Tạm được, đời mà ai hoàn hảo"],
+      350: ["Mới ngủ dậy hả? 😴","Cần cà phê không bạn?","Hơi chậm rồi đó nha..."],
+      500: ["Chậm như rùa luôn 🐢 haha","Bà ngoại tui còn nhanh hơn đó","Đang lướt TikTok hả? Thú thật đi 😂"],
+      9999:["Còn sống không bạn? Hỏi thật 😂","Nên đi khám bác sĩ nha, nghiêm túc đó","Ngủ gục rồi hả? 😴😴"]
+    },
+    rankLabels: {
+      SSS: 'Top 0.01% — Siêu nhân',
+      SS: 'Top 0.1%',
+      S: 'Top 1%',
+      A: 'Top 5%',
+      B: 'Top 20%',
+      C: 'Top 50%',
+      D: 'Top 80%',
+      F: 'Kiểm tra mạch đi bạn'
+    },
+    ageCompare: [
+      [160, "Phản xạ nhanh hơn pro gamer 18 tuổi"],
+      [200, "Phản xạ tương đương thanh niên 20 tuổi"],
+      [240, "Phản xạ tương đương người 25 tuổi"],
+      [280, "Phản xạ tương đương dân văn phòng 35 tuổi"],
+      [330, "Phản xạ chậm hơn người 45 tuổi một chút"],
+      [400, "Phản xạ tương đương người về hưu 55 tuổi"],
+      [500, "Phản xạ chậm hơn cụ ông 65 tuổi"],
+      [9999, "Phản xạ trên 80 tuổi... tập thể dục đi bạn"]
+    ],
+    shareText: (rank, avg, label, taunt) =>
+      `⚡ Kiểm Tra Phản Xạ\n\n🏅 Hạng: ${rank}\n⏱️ Trung bình: ${avg}ms\n📊 ${label}\n\n${taunt}\n\nNhanh hơn tui không? 👇\nhttps://yuchenchen-debug.github.io/reaction-test/`
+  }
+};
+
+// Current language
+let curLang = 'zh-TW';
+
+function detectLang() {
+  const saved = localStorage.getItem('reaction-lang');
+  if (saved && LANG[saved]) return saved;
+  const nav = (navigator.language || navigator.userLanguage || '').toLowerCase();
+  if (nav.startsWith('zh-tw') || nav === 'zh-hant' || nav.startsWith('zh-hant')) return 'zh-TW';
+  if (nav.startsWith('zh')) return 'zh-TW';
+  if (nav.startsWith('ja')) return 'ja';
+  if (nav.startsWith('ko')) return 'ko';
+  if (nav.startsWith('es')) return 'es';
+  if (nav.startsWith('pt')) return 'pt';
+  if (nav.startsWith('de')) return 'de';
+  if (nav.startsWith('fr')) return 'fr';
+  if (nav.startsWith('th')) return 'th';
+  if (nav.startsWith('id') || nav.startsWith('ms')) return 'id';
+  if (nav.startsWith('vi')) return 'vi';
+  if (nav.startsWith('en')) return 'en';
+  return 'zh-TW';
+}
+
+function t(key) {
+  return LANG[curLang][key] || LANG['zh-TW'][key] || key;
+}
+
+function applyLang() {
+  const L = LANG[curLang];
+
+  // Update all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (L[key] !== undefined) {
+      if (key === 'statAvg' || key === 'statRecord') {
+        el.innerHTML = L[key];
+      } else {
+        el.textContent = L[key];
+      }
+    }
+  });
+
+  // Update html lang attribute
+  const langMap = {'zh-TW':'zh-Hant','en':'en','ja':'ja','ko':'ko','es':'es','pt':'pt','de':'de','fr':'fr','th':'th','id':'id','vi':'vi'};
+  document.documentElement.lang = langMap[curLang] || curLang;
+
+  // Update meta tags
+  document.title = L.metaTitle;
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.content = L.metaDesc;
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.content = L.ogTitle;
+  const ogDesc = document.querySelector('meta[property="og:description"]');
+  if (ogDesc) ogDesc.content = L.ogDesc;
+  const twTitle = document.querySelector('meta[name="twitter:title"]');
+  if (twTitle) twTitle.content = L.twitterTitle;
+  const twDesc = document.querySelector('meta[name="twitter:description"]');
+  if (twDesc) twDesc.content = L.twitterDesc;
+
+  // Update PB display
+  showPB();
+
+  // Update more-games section
+  const moreTitle = document.getElementById('moreGamesTitle');
+  if (moreTitle) moreTitle.textContent = L.moreGames;
+  const g1n = document.getElementById('game1Name');
+  if (g1n) g1n.textContent = L.game1Name;
+  const g1h = document.getElementById('game1Hook');
+  if (g1h) g1h.textContent = L.game1Hook;
+  const g2n = document.getElementById('game2Name');
+  if (g2n) g2n.textContent = L.game2Name;
+  const g2h = document.getElementById('game2Hook');
+  if (g2h) g2h.textContent = L.game2Hook;
+  const g3n = document.getElementById('game3Name');
+  if (g3n) g3n.textContent = L.game3Name;
+  const g3h = document.getElementById('game3Hook');
+  if (g3h) g3h.textContent = L.game3Hook;
+
+  // Update player count text
+  document.getElementById('total-players').textContent = fakeCount();
+
+  // Save preference
+  localStorage.setItem('reaction-lang', curLang);
+}
+
+// Language switcher
+document.getElementById('langSelect').addEventListener('change', function() {
+  curLang = this.value;
+  applyLang();
+});
+
 // Firebase init
 firebase.initializeApp({
   apiKey:"AIzaSyC977FBxgGqVCrEjYc_J5JlefMWNCgffg0",
@@ -272,47 +1312,42 @@ function setPB(ms) { localStorage.setItem('reaction-pb', ms); }
 function showPB() {
   const pb = getPB();
   const el = document.getElementById('pb-display');
-  el.textContent = pb ? `個人最佳: ${pb}ms` : '';
+  el.textContent = pb ? `${t('pbLabel')}: ${pb}ms` : '';
 }
 
-// Taunts
-const earlyTaunts = ["太早了！你是不是偷看？","耐心是美德","急什麼！等綠色啊","你搶跑了 🏃","冷靜點，深呼吸"];
-const roundTaunts = {
-  150: ["...你是開掛的吧？","人類不可能有這種反應","你是機器人嗎？"],
-  180: ["電競選手級","你的神經傳導速度異常","可以去打職業了"],
-  220: ["還不錯","比大部分人快","中上水準"],
-  270: ["普通人類","平均水準，沒什麼好驕傲的","一般般"],
-  350: ["有點慢...","你是剛睡醒嗎","需要咖啡嗎"],
-  500: ["烏龜級反應力","你奶奶可能比你快","是不是在看手機"],
-  9999:["你確定你還活著嗎","建議去醫院檢查","...你睡著了？"]
-};
+// Taunts (localized)
+function getEarlyTaunt() {
+  const taunts = LANG[curLang].earlyTaunts;
+  return taunts[Math.random()*taunts.length|0];
+}
 
 function getTaunt(ms) {
+  const taunts = LANG[curLang].roundTaunts;
   const thresholds = [150,180,220,270,350,500,9999];
-  for (const t of thresholds) { if (ms < t) return roundTaunts[t][Math.random()*roundTaunts[t].length|0]; }
-  return roundTaunts[9999][0];
+  for (const th of thresholds) {
+    if (ms < th) return taunts[th][Math.random()*taunts[th].length|0];
+  }
+  return taunts[9999][0];
 }
 
 function getRank(ms) {
-  if (ms < 150) return {rank:'SSS',color:'#ff2d55',label:'前 0.01% — 非人類',pct:0.01};
-  if (ms < 170) return {rank:'SS',color:'#ff6b00',label:'前 0.1%',pct:0.1};
-  if (ms < 200) return {rank:'S',color:'#ffcc00',label:'前 1%',pct:1};
-  if (ms < 230) return {rank:'A',color:'var(--green)',label:'前 5%',pct:5};
-  if (ms < 270) return {rank:'B',color:'var(--blue)',label:'前 20%',pct:20};
-  if (ms < 350) return {rank:'C',color:'var(--white)',label:'前 50%',pct:50};
-  if (ms < 500) return {rank:'D',color:'var(--gray)',label:'前 80%',pct:80};
-  return {rank:'F',color:'#ff2d55',label:'請確認你還有脈搏',pct:99};
+  const L = LANG[curLang].rankLabels;
+  if (ms < 150) return {rank:'SSS',color:'#ff2d55',label:L.SSS,pct:0.01};
+  if (ms < 170) return {rank:'SS',color:'#ff6b00',label:L.SS,pct:0.1};
+  if (ms < 200) return {rank:'S',color:'#ffcc00',label:L.S,pct:1};
+  if (ms < 230) return {rank:'A',color:'var(--green)',label:L.A,pct:5};
+  if (ms < 270) return {rank:'B',color:'var(--blue)',label:L.B,pct:20};
+  if (ms < 350) return {rank:'C',color:'var(--white)',label:L.C,pct:50};
+  if (ms < 500) return {rank:'D',color:'var(--gray)',label:L.D,pct:80};
+  return {rank:'F',color:'#ff2d55',label:L.F,pct:99};
 }
 
 function getAgeCompare(ms) {
-  if (ms < 160) return "你的反應力比 18 歲電競選手還快";
-  if (ms < 200) return "你的反應力相當於 20 歲年輕人";
-  if (ms < 240) return "你的反應力相當於 25 歲成年人";
-  if (ms < 280) return "你的反應力相當於 35 歲上班族";
-  if (ms < 330) return "你的反應力比 45 歲中年人還慢一點";
-  if (ms < 400) return "你的反應力相當於 55 歲退休人士";
-  if (ms < 500) return "你的反應力比 65 歲老人還慢";
-  return "你的反應力比 80 歲老人還慢...建議多運動";
+  const ages = LANG[curLang].ageCompare;
+  for (const [threshold, text] of ages) {
+    if (ms < threshold) return text;
+  }
+  return ages[ages.length - 1][1];
 }
 
 // Fake player count
@@ -349,7 +1384,7 @@ game.addEventListener('click', (e) => {
     // Too early
     clearTimeout(greenTimeout);
     results.push({ms: 1000, foul: true});
-    document.getElementById('earlyTaunt').textContent = earlyTaunts[Math.random()*earlyTaunts.length|0];
+    document.getElementById('earlyTaunt').textContent = getEarlyTaunt();
     showScreen('tooearly');
   } else if (state === 'ready') {
     const ms = Math.round(performance.now() - greenTime);
@@ -357,7 +1392,7 @@ game.addEventListener('click', (e) => {
     document.getElementById('msDisplay').textContent = ms + 'ms';
     document.getElementById('msDisplay').style.color = ms < 200 ? 'var(--green)' : ms < 300 ? 'var(--white)' : 'var(--red)';
     document.getElementById('roundTaunt').textContent = getTaunt(ms);
-    document.getElementById('roundInfo').textContent = `第 ${currentRound} / ${TOTAL_ROUNDS} 輪`;
+    document.getElementById('roundInfo').textContent = LANG[curLang].roundInfo(currentRound, TOTAL_ROUNDS);
     showScreen('result');
   } else if (state === 'tooearly' || state === 'result') {
     if (currentRound < TOTAL_ROUNDS) {
@@ -381,7 +1416,7 @@ function showFinal() {
   document.getElementById('avgDisplay').textContent = avg + 'ms';
   document.getElementById('tauntFinal').textContent = getTaunt(avg);
   document.getElementById('ageCompare').textContent = getAgeCompare(avg);
-  document.getElementById('percentile').textContent = `你的成績超越了 ${(100 - info.pct).toFixed(2)}% 的玩家`;
+  document.getElementById('percentile').textContent = LANG[curLang].percentileText((100 - info.pct).toFixed(2));
 
   // Rounds list
   const list = document.getElementById('roundsList');
@@ -390,7 +1425,7 @@ function showFinal() {
     const row = document.createElement('div');
     row.className = 'round-row';
     const cls = r.foul ? 'foul' : r.ms < 200 ? 'fast' : r.ms < 300 ? 'mid' : 'slow';
-    row.innerHTML = `<span class="r-num">第 ${i+1} 輪</span><span class="r-val ${cls}">${r.foul ? '犯規 (+1000ms)' : r.ms + 'ms'}</span>`;
+    row.innerHTML = `<span class="r-num">${LANG[curLang].roundLabel(i+1)}</span><span class="r-val ${cls}">${r.foul ? t('foulText') : r.ms + 'ms'}</span>`;
     list.appendChild(row);
   });
 
@@ -398,9 +1433,9 @@ function showFinal() {
   const pb = getPB();
   if (!pb || avg < pb) {
     setPB(avg);
-    document.getElementById('pb-final').innerHTML = `<span style="color:var(--green);font-size:14px">🎉 新個人最佳！</span>`;
+    document.getElementById('pb-final').innerHTML = `<span style="color:var(--green);font-size:14px">${t('newPB')}</span>`;
   } else {
-    document.getElementById('pb-final').innerHTML = `<span style="color:var(--gray);font-size:14px">個人最佳: ${pb}ms</span>`;
+    document.getElementById('pb-final').innerHTML = `<span style="color:var(--gray);font-size:14px">${t('pbLabel')}: ${pb}ms</span>`;
   }
 
   // Save to Firebase
@@ -425,7 +1460,7 @@ function saveScore(avg) {
 
 function loadLeaderboard() {
   const list = document.getElementById('lbList');
-  list.innerHTML = '<div style="color:var(--gray);text-align:center;padding:20px">載入中...</div>';
+  list.innerHTML = `<div style="color:var(--gray);text-align:center;padding:20px">${t('lbLoading')}</div>`;
   db.ref('reaction-scores').orderByChild('ms').limitToFirst(20).once('value').then(snap => {
     list.innerHTML = '';
     let rank = 0;
@@ -438,16 +1473,16 @@ function loadLeaderboard() {
       row.innerHTML = `<span class="lb-rank">${medal}</span><span class="lb-name">${d.name || 'Anonymous'}</span><span class="lb-ms">${d.ms}ms</span>`;
       list.appendChild(row);
     });
-    if (rank === 0) list.innerHTML = '<div style="color:var(--gray);text-align:center;padding:20px">還沒有記錄</div>';
+    if (rank === 0) list.innerHTML = `<div style="color:var(--gray);text-align:center;padding:20px">${t('lbEmpty')}</div>`;
   }).catch(() => {
-    list.innerHTML = '<div style="color:var(--gray);text-align:center;padding:20px">無法載入</div>';
+    list.innerHTML = `<div style="color:var(--gray);text-align:center;padding:20px">${t('lbError')}</div>`;
   });
 }
 
 // Share
 function getShareText(avg) {
   const info = getRank(avg);
-  return `⚡ 反應力測試結果\n\n🏅 等級: ${info.rank}\n⏱️ 平均: ${avg}ms\n📊 ${info.label}\n\n${getTaunt(avg)}\n\n你能比我快嗎？👇\nhttps://yuchenchen-debug.github.io/reaction-test/`;
+  return LANG[curLang].shareText(info.rank, avg, info.label, getTaunt(avg));
 }
 
 function generateShareImage(avg) {
@@ -468,7 +1503,7 @@ function generateShareImage(avg) {
   ctx.fillStyle = '#888';
   ctx.font = '600 36px JetBrains Mono, monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('⚡ 反應力測試', w/2, 120);
+  ctx.fillText(t('shareCanvasTitle'), w/2, 120);
 
   // Rank
   ctx.font = '800 180px JetBrains Mono, monospace';
@@ -483,7 +1518,7 @@ function generateShareImage(avg) {
   // Label
   ctx.font = '600 32px JetBrains Mono, monospace';
   ctx.fillStyle = '#888';
-  ctx.fillText('平均反應時間', w/2, 600);
+  ctx.fillText(t('shareCanvasAvg'), w/2, 600);
 
   // Percentile
   ctx.font = '600 36px JetBrains Mono, monospace';
@@ -505,7 +1540,7 @@ function generateShareImage(avg) {
     ctx.fillText(`R${i+1}`, 300, y);
     ctx.textAlign = 'right';
     ctx.fillStyle = r.foul ? '#00f0ff' : r.ms < 200 ? '#00ff88' : r.ms < 300 ? '#fff' : '#ff2d55';
-    ctx.fillText(r.foul ? '犯規' : r.ms + 'ms', 780, y);
+    ctx.fillText(r.foul ? t('shareCanvasFoul') : r.ms + 'ms', 780, y);
   });
 
   // URL
@@ -532,8 +1567,8 @@ document.getElementById('shareTwitter').addEventListener('click', () => {
 document.getElementById('shareCopy').addEventListener('click', () => {
   const avg = getAvg();
   navigator.clipboard.writeText(getShareText(avg)).then(() => {
-    document.getElementById('shareCopy').textContent = '✅ 已複製';
-    setTimeout(() => document.getElementById('shareCopy').textContent = '📋 複製', 2000);
+    document.getElementById('shareCopy').textContent = t('copiedBtn');
+    setTimeout(() => document.getElementById('shareCopy').textContent = t('copyBtn'), 2000);
   });
 });
 
@@ -544,7 +1579,7 @@ document.getElementById('shareIG').addEventListener('click', () => {
   canvas.toBlob(blob => {
     if (navigator.share) {
       const file = new File([blob], 'reaction-test.png', {type:'image/png'});
-      navigator.share({files:[file], title:'反應力測試'}).catch(()=>{});
+      navigator.share({files:[file], title: t('title')}).catch(()=>{});
     } else {
       downloadImage();
     }
@@ -576,6 +1611,11 @@ document.getElementById('lbBtn2').addEventListener('click', () => { loadLeaderbo
 document.getElementById('closeLb').addEventListener('click', () => { document.getElementById('lbModal').classList.remove('show'); });
 document.getElementById('lbModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) document.getElementById('lbModal').classList.remove('show'); });
 
+// Init i18n
+curLang = detectLang();
+document.getElementById('langSelect').value = curLang;
+applyLang();
+
 // Init
 showPB();
 
@@ -602,22 +1642,22 @@ try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
 .game-card .hook{font-size:11px;color:#666;line-height:1.3}
 </style>
 <div class="more-games">
-  <h3>🎮 更多挑戰</h3>
+  <h3 id="moreGamesTitle">🎮 更多挑戰</h3>
   <div class="more-games-row">
     <a class="game-card" href="https://yuchenchen-debug.github.io/millisecond-challenge/">
       <span class="emoji">⏱️</span>
-      <div class="name">千分之一秒</div>
-      <div class="hook">只有 0.01% 拿到 SSS 級</div>
+      <div class="name" id="game1Name">千分之一秒</div>
+      <div class="hook" id="game1Hook">只有 0.01% 拿到 SSS 級</div>
     </a>
     <a class="game-card" href="https://yuchenchen-debug.github.io/color-iq-test/">
       <span class="emoji">🎨</span>
-      <div class="name">色覺測試</div>
-      <div class="hook">只有 2.1% 通過 Level 25</div>
+      <div class="name" id="game2Name">色覺測試</div>
+      <div class="hook" id="game2Hook">只有 2.1% 通過 Level 25</div>
     </a>
     <a class="game-card" href="https://yuchenchen-debug.github.io/memory-limit/">
       <span class="emoji">🧠</span>
-      <div class="name">記憶極限</div>
-      <div class="hook">一般人記住 7 個，你呢？</div>
+      <div class="name" id="game3Name">記憶極限</div>
+      <div class="hook" id="game3Hook">一般人記住 7 個，你呢？</div>
     </a>
   </div>
 </div>
