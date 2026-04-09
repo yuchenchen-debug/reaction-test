@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yuchenchen-debug.github.io/reaction-test/sitemap.xml

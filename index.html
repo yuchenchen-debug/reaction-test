@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>反應力測試 - 你的反應速度有多快？</title>
+<meta name="description" content="測試你的反應速度！5 輪挑戰，看看你是電競選手級還是烏龜級。累計超過 300 萬人測試過！">
+<meta name="theme-color" content="#ff2d55">
+<link rel="manifest" href="manifest.json">
+
+<!-- OG -->
+<meta property="og:title" content="反應力測試 - 我的反應速度是 ???ms">
+<meta property="og:description" content="測試你的反應速度！5 輪挑戰，看看你是電競選手級還是烏龜級 ⚡">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yuchenchen-debug.github.io/reaction-test/">
+<meta property="og:image" content="https://yuchenchen-debug.github.io/reaction-test/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="反應力測試 ⚡">
+<meta name="twitter:description" content="測試你的反應速度！你比人類平均快還是慢？">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XW1MRWJR2G"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-XW1MRWJR2G');</script>
+
+<!-- AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4737693030554043" crossorigin="anonymous"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;font-family:'JetBrains Mono',monospace;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+
+:root{
+  --red:#ff2d55;--green:#00ff88;--blue:#00f0ff;--dark:#0a0a0f;--dark2:#14141f;
+  --gray:#888;--white:#f0f0f0;
+}
+
+/* States */
+#game{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background-color .05s;cursor:pointer;overflow:hidden}
+#game.state-menu{background:var(--dark);cursor:default}
+#game.state-waiting{background:var(--red)}
+#game.state-ready{background:var(--green)}
+#game.state-tooearly{background:var(--blue)}
+#game.state-result{background:var(--dark);cursor:default}
+#game.state-final{background:var(--dark);cursor:default;overflow-y:auto;justify-content:flex-start;padding:40px 20px 120px}
+
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;max-width:500px;padding:20px}
+.screen.active{display:flex}
+
+/* Menu */
+#menu-screen h1{font-size:clamp(28px,7vw,48px);color:var(--white);margin-bottom:8px;font-weight:800}
+#menu-screen .subtitle{color:var(--gray);font-size:clamp(12px,3vw,16px);margin-bottom:32px}
+#menu-screen .stats-box{background:var(--dark2);border:1px solid #222;border-radius:16px;padding:20px;width:100%;margin-bottom:24px;text-align:left}
+#menu-screen .stats-box .stat{color:var(--gray);font-size:13px;margin:6px 0;line-height:1.5}
+#menu-screen .stats-box .stat span{color:var(--white)}
+.btn{background:var(--red);color:#fff;border:none;padding:16px 48px;border-radius:50px;font-size:clamp(16px,4vw,22px);font-family:inherit;font-weight:700;cursor:pointer;transition:transform .1s,opacity .1s;letter-spacing:1px}
+.btn:active{transform:scale(.95);opacity:.9}
+.btn-sm{padding:10px 24px;font-size:14px;border-radius:30px}
+.btn-outline{background:transparent;border:2px solid #333;color:var(--white)}
+.btn-outline:active{background:#222}
+#pb-display{color:var(--blue);font-size:14px;margin-top:16px}
+.menu-btns{display:flex;gap:12px;margin-top:12px}
+
+/* Waiting */
+#wait-screen .msg{font-size:clamp(32px,10vw,64px);color:#fff;font-weight:800;animation:pulse 1.5s infinite}
+#wait-screen .round-indicator{color:rgba(255,255,255,.5);font-size:18px;margin-top:16px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* Ready */
+#ready-screen .msg{font-size:clamp(32px,10vw,72px);color:#000;font-weight:800}
+#ready-screen .sub{color:rgba(0,0,0,.6);font-size:18px;margin-top:8px}
+
+/* Too early */
+#early-screen .msg{font-size:clamp(24px,6vw,42px);color:#fff;font-weight:700}
+#early-screen .taunt{color:rgba(255,255,255,.7);font-size:16px;margin-top:12px}
+#early-screen .tap-hint{color:rgba(255,255,255,.4);font-size:14px;margin-top:24px}
+
+/* Round result */
+#result-screen .ms-display{font-size:clamp(48px,16vw,100px);font-weight:800;color:var(--green);animation:popIn .3s ease-out}
+#result-screen .ms-label{font-size:18px;color:var(--gray);margin-top:4px}
+#result-screen .taunt{font-size:clamp(16px,4vw,22px);color:var(--white);margin-top:16px;font-weight:700}
+#result-screen .round-info{color:var(--gray);font-size:14px;margin-top:24px}
+#result-screen .tap-hint{color:#555;font-size:13px;margin-top:16px}
+@keyframes popIn{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+
+/* Final */
+#final-screen{align-items:center;width:100%;max-width:500px;margin:0 auto}
+#final-screen .rank-badge{font-size:clamp(48px,14vw,80px);font-weight:800;margin-bottom:4px;animation:popIn .4s ease-out}
+#final-screen .rank-label{font-size:16px;color:var(--gray);margin-bottom:8px}
+#final-screen .avg-display{font-size:clamp(36px,12vw,72px);font-weight:800;color:var(--white);animation:popIn .5s ease-out}
+#final-screen .avg-label{font-size:14px;color:var(--gray);margin-top:4px;margin-bottom:16px}
+#final-screen .taunt-final{font-size:clamp(16px,4vw,22px);color:var(--red);font-weight:700;margin-bottom:20px;text-align:center;line-height:1.4}
+#final-screen .age-compare{color:var(--blue);font-size:14px;margin-bottom:20px}
+#final-screen .percentile{color:var(--gray);font-size:14px;margin-bottom:24px}
+#final-screen .rounds-list{width:100%;margin-bottom:24px}
+#final-screen .round-row{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid #1a1a2a;font-size:14px}
+#final-screen .round-row .r-num{color:var(--gray)}
+#final-screen .round-row .r-val{font-weight:700}
+#final-screen .round-row .r-val.fast{color:var(--green)}
+#final-screen .round-row .r-val.mid{color:var(--white)}
+#final-screen .round-row .r-val.slow{color:var(--red)}
+#final-screen .round-row .r-val.foul{color:var(--blue)}
+.share-section{width:100%;margin-bottom:24px}
+.share-section h3{color:var(--white);font-size:16px;margin-bottom:12px;text-align:center}
+.share-btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.share-btn{padding:10px 16px;border-radius:25px;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:transform .1s}
+.share-btn:active{transform:scale(.95)}
+.share-btn.line{background:#06c755;color:#fff}
+.share-btn.twitter{background:#1da1f2;color:#fff}
+.share-btn.copy{background:#333;color:#fff}
+.share-btn.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff}
+.share-btn.dl{background:#555;color:#fff}
+.final-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+
+/* Leaderboard modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--dark2);border:1px solid #222;border-radius:20px;padding:24px;width:100%;max-width:420px;max-height:80vh;overflow-y:auto}
+.modal h2{color:var(--white);font-size:20px;margin-bottom:16px;text-align:center}
+.lb-row{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #1a1a2a;font-size:14px}
+.lb-row .lb-rank{color:var(--gray);width:30px}
+.lb-row .lb-name{color:var(--white);flex:1}
+.lb-row .lb-ms{color:var(--green);font-weight:700}
+.modal .close-btn{display:block;margin:16px auto 0;padding:10px 32px;background:#333;color:#fff;border:none;border-radius:25px;font-family:inherit;font-size:14px;cursor:pointer}
+
+/* Ad placeholder */
+.ad-slot{width:100%;max-width:400px;min-height:50px;margin:16px auto;text-align:center}
+
+/* Canvas (hidden) */
+#shareCanvas{display:none}
+</style>
+</head>
+<body>
+
+<div id="game" class="state-menu">
+
+  <!-- MENU -->
+  <div id="menu-screen" class="screen active">
+    <h1>⚡ 反應力測試</h1>
+    <p class="subtitle">你的反應速度有多快？</p>
+    <div class="stats-box">
+      <div class="stat">累計 <span id="total-players">3,291,847</span> 人測試</div>
+      <div class="stat">人類平均反應時間: <span>273ms</span></div>
+      <div class="stat">世界紀錄: <span>121ms</span> (🇰🇷 FlashKim)</div>
+    </div>
+    <button class="btn" id="startBtn">開始測試</button>
+    <div class="menu-btns">
+      <button class="btn btn-sm btn-outline" id="lbBtn">🏆 排行榜</button>
+    </div>
+    <div id="pb-display"></div>
+    <div class="ad-slot"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4737693030554043" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins></div>
+  </div>
+
+  <!-- WAITING (RED) -->
+  <div id="wait-screen" class="screen">
+    <div class="msg">等待...</div>
+    <div class="round-indicator">第 <span id="roundNum">1</span> / 5 輪</div>
+  </div>
+
+  <!-- READY (GREEN) -->
+  <div id="ready-screen" class="screen">
+    <div class="msg">按！</div>
+    <div class="sub">快點！</div>
+  </div>
+
+  <!-- TOO EARLY (BLUE) -->
+  <div id="early-screen" class="screen">
+    <div class="msg">犯規！</div>
+    <div class="taunt" id="earlyTaunt"></div>
+    <div class="tap-hint">點擊繼續</div>
+  </div>
+
+  <!-- ROUND RESULT -->
+  <div id="result-screen" class="screen">
+    <div class="ms-display" id="msDisplay"></div>
+    <div class="ms-label">毫秒</div>
+    <div class="taunt" id="roundTaunt"></div>
+    <div class="round-info" id="roundInfo"></div>
+    <div class="tap-hint">點擊繼續</div>
+  </div>
+
+  <!-- FINAL RESULT -->
+  <div id="final-screen" class="screen">
+    <div class="rank-badge" id="rankBadge"></div>
+    <div class="rank-label" id="rankLabel"></div>
+    <div class="avg-display" id="avgDisplay"></div>
+    <div class="avg-label">平均反應時間</div>
+    <div class="taunt-final" id="tauntFinal"></div>
+    <div class="age-compare" id="ageCompare"></div>
+    <div class="percentile" id="percentile"></div>
+    <div class="rounds-list" id="roundsList"></div>
+    <div class="share-section">
+      <h3>分享你的成績</h3>
+      <div class="share-btns">
+        <button class="share-btn line" id="shareLine">LINE</button>
+        <button class="share-btn twitter" id="shareTwitter">𝕏 Twitter</button>
+        <button class="share-btn copy" id="shareCopy">📋 複製</button>
+        <button class="share-btn ig" id="shareIG">IG Story</button>
+        <button class="share-btn dl" id="shareDL">📥 下載圖片</button>
+      </div>
+    </div>
+    <div class="final-btns">
+      <button class="btn" id="retryBtn">再測一次</button>
+      <button class="btn btn-sm btn-outline" id="lbBtn2">🏆 排行榜</button>
+    </div>
+    <div class="ad-slot"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4737693030554043" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins></div>
+    <div id="pb-final"></div>
+  </div>
+</div>
+
+<!-- Leaderboard modal -->
+<div class="modal-overlay" id="lbModal">
+  <div class="modal">
+    <h2>🏆 排行榜 TOP 20</h2>
+    <div id="lbList"></div>
+    <button class="close-btn" id="closeLb">關閉</button>
+  </div>
+</div>
+
+<canvas id="shareCanvas" width="1080" height="1080"></canvas>
+
+<script>
+// Firebase init
+firebase.initializeApp({
+  apiKey:"AIzaSyC977FBxgGqVCrEjYc_J5JlefMWNCgffg0",
+  authDomain:"yuchenchen-60a08.firebaseapp.com",
+  databaseURL:"https://yuchenchen-60a08-default-rtdb.firebaseio.com",
+  projectId:"yuchenchen-60a08"
+});
+const db = firebase.database();
+
+// Game state
+const TOTAL_ROUNDS = 5;
+let currentRound = 0;
+let results = []; // {ms: number, foul: boolean}
+let state = 'menu'; // menu, waiting, ready, tooearly, result, final
+let greenTimeout = null;
+let greenTime = 0;
+
+const game = document.getElementById('game');
+const screens = {
+  menu: document.getElementById('menu-screen'),
+  waiting: document.getElementById('wait-screen'),
+  ready: document.getElementById('ready-screen'),
+  tooearly: document.getElementById('early-screen'),
+  result: document.getElementById('result-screen'),
+  final: document.getElementById('final-screen')
+};
+
+function showScreen(name) {
+  state = name;
+  game.className = 'state-' + (name === 'waiting' ? 'waiting' : name === 'ready' ? 'ready' : name === 'tooearly' ? 'tooearly' : name === 'result' ? 'result' : name === 'final' ? 'final' : 'menu');
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+  if (name === 'final') {
+    game.style.overflowY = 'auto';
+    game.scrollTop = 0;
+  } else {
+    game.style.overflowY = 'hidden';
+  }
+}
+
+// Personal best
+function getPB() { return parseInt(localStorage.getItem('reaction-pb') || '0'); }
+function setPB(ms) { localStorage.setItem('reaction-pb', ms); }
+
+function showPB() {
+  const pb = getPB();
+  const el = document.getElementById('pb-display');
+  el.textContent = pb ? `個人最佳: ${pb}ms` : '';
+}
+
+// Taunts
+const earlyTaunts = ["太早了！你是不是偷看？","耐心是美德","急什麼！等綠色啊","你搶跑了 🏃","冷靜點，深呼吸"];
+const roundTaunts = {
+  150: ["...你是開掛的吧？","人類不可能有這種反應","你是機器人嗎？"],
+  180: ["電競選手級","你的神經傳導速度異常","可以去打職業了"],
+  220: ["還不錯","比大部分人快","中上水準"],
+  270: ["普通人類","平均水準，沒什麼好驕傲的","一般般"],
+  350: ["有點慢...","你是剛睡醒嗎","需要咖啡嗎"],
+  500: ["烏龜級反應力","你奶奶可能比你快","是不是在看手機"],
+  9999:["你確定你還活著嗎","建議去醫院檢查","...你睡著了？"]
+};
+
+function getTaunt(ms) {
+  const thresholds = [150,180,220,270,350,500,9999];
+  for (const t of thresholds) { if (ms < t) return roundTaunts[t][Math.random()*roundTaunts[t].length|0]; }
+  return roundTaunts[9999][0];
+}
+
+function getRank(ms) {
+  if (ms < 150) return {rank:'SSS',color:'#ff2d55',label:'前 0.01% — 非人類',pct:0.01};
+  if (ms < 170) return {rank:'SS',color:'#ff6b00',label:'前 0.1%',pct:0.1};
+  if (ms < 200) return {rank:'S',color:'#ffcc00',label:'前 1%',pct:1};
+  if (ms < 230) return {rank:'A',color:'var(--green)',label:'前 5%',pct:5};
+  if (ms < 270) return {rank:'B',color:'var(--blue)',label:'前 20%',pct:20};
+  if (ms < 350) return {rank:'C',color:'var(--white)',label:'前 50%',pct:50};
+  if (ms < 500) return {rank:'D',color:'var(--gray)',label:'前 80%',pct:80};
+  return {rank:'F',color:'#ff2d55',label:'請確認你還有脈搏',pct:99};
+}
+
+function getAgeCompare(ms) {
+  if (ms < 160) return "你的反應力比 18 歲電競選手還快";
+  if (ms < 200) return "你的反應力相當於 20 歲年輕人";
+  if (ms < 240) return "你的反應力相當於 25 歲成年人";
+  if (ms < 280) return "你的反應力相當於 35 歲上班族";
+  if (ms < 330) return "你的反應力比 45 歲中年人還慢一點";
+  if (ms < 400) return "你的反應力相當於 55 歲退休人士";
+  if (ms < 500) return "你的反應力比 65 歲老人還慢";
+  return "你的反應力比 80 歲老人還慢...建議多運動";
+}
+
+// Fake player count
+function fakeCount() {
+  const base = 3291847;
+  const extra = Math.floor((Date.now() - new Date('2026-01-01').getTime()) / 30000);
+  return (base + extra).toLocaleString();
+}
+document.getElementById('total-players').textContent = fakeCount();
+
+// Start
+function startGame() {
+  currentRound = 0;
+  results = [];
+  nextRound();
+}
+
+function nextRound() {
+  currentRound++;
+  document.getElementById('roundNum').textContent = currentRound;
+  showScreen('waiting');
+  const delay = 1000 + Math.random() * 4000;
+  greenTimeout = setTimeout(() => {
+    greenTime = performance.now();
+    showScreen('ready');
+  }, delay);
+}
+
+// Tap handling
+game.addEventListener('click', (e) => {
+  if (e.target.closest('button') || e.target.closest('.modal') || e.target.closest('.share-btns') || e.target.closest('.final-btns') || e.target.closest('.menu-btns')) return;
+
+  if (state === 'waiting') {
+    // Too early
+    clearTimeout(greenTimeout);
+    results.push({ms: 1000, foul: true});
+    document.getElementById('earlyTaunt').textContent = earlyTaunts[Math.random()*earlyTaunts.length|0];
+    showScreen('tooearly');
+  } else if (state === 'ready') {
+    const ms = Math.round(performance.now() - greenTime);
+    results.push({ms, foul: false});
+    document.getElementById('msDisplay').textContent = ms + 'ms';
+    document.getElementById('msDisplay').style.color = ms < 200 ? 'var(--green)' : ms < 300 ? 'var(--white)' : 'var(--red)';
+    document.getElementById('roundTaunt').textContent = getTaunt(ms);
+    document.getElementById('roundInfo').textContent = `第 ${currentRound} / ${TOTAL_ROUNDS} 輪`;
+    showScreen('result');
+  } else if (state === 'tooearly' || state === 'result') {
+    if (currentRound < TOTAL_ROUNDS) {
+      nextRound();
+    } else {
+      showFinal();
+    }
+  }
+});
+
+function showFinal() {
+  const validResults = results.filter(r => !r.foul);
+  const totalMs = results.reduce((sum, r) => sum + r.ms, 0);
+  const avg = Math.round(totalMs / results.length);
+
+  const info = getRank(avg);
+
+  document.getElementById('rankBadge').textContent = info.rank;
+  document.getElementById('rankBadge').style.color = info.color;
+  document.getElementById('rankLabel').textContent = info.label;
+  document.getElementById('avgDisplay').textContent = avg + 'ms';
+  document.getElementById('tauntFinal').textContent = getTaunt(avg);
+  document.getElementById('ageCompare').textContent = getAgeCompare(avg);
+  document.getElementById('percentile').textContent = `你的成績超越了 ${(100 - info.pct).toFixed(2)}% 的玩家`;
+
+  // Rounds list
+  const list = document.getElementById('roundsList');
+  list.innerHTML = '';
+  results.forEach((r, i) => {
+    const row = document.createElement('div');
+    row.className = 'round-row';
+    const cls = r.foul ? 'foul' : r.ms < 200 ? 'fast' : r.ms < 300 ? 'mid' : 'slow';
+    row.innerHTML = `<span class="r-num">第 ${i+1} 輪</span><span class="r-val ${cls}">${r.foul ? '犯規 (+1000ms)' : r.ms + 'ms'}</span>`;
+    list.appendChild(row);
+  });
+
+  // Personal best
+  const pb = getPB();
+  if (!pb || avg < pb) {
+    setPB(avg);
+    document.getElementById('pb-final').innerHTML = `<span style="color:var(--green);font-size:14px">🎉 新個人最佳！</span>`;
+  } else {
+    document.getElementById('pb-final').innerHTML = `<span style="color:var(--gray);font-size:14px">個人最佳: ${pb}ms</span>`;
+  }
+
+  // Save to Firebase
+  saveScore(avg);
+
+  showScreen('final');
+
+  // Try push ads
+  try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+}
+
+// Firebase
+function saveScore(avg) {
+  const name = 'Player_' + Math.random().toString(36).substr(2,5);
+  db.ref('reaction-scores').push({
+    name,
+    ms: avg,
+    rounds: results.map(r => r.foul ? 'foul' : r.ms),
+    ts: Date.now()
+  }).catch(() => {});
+}
+
+function loadLeaderboard() {
+  const list = document.getElementById('lbList');
+  list.innerHTML = '<div style="color:var(--gray);text-align:center;padding:20px">載入中...</div>';
+  db.ref('reaction-scores').orderByChild('ms').limitToFirst(20).once('value').then(snap => {
+    list.innerHTML = '';
+    let rank = 0;
+    snap.forEach(child => {
+      rank++;
+      const d = child.val();
+      const row = document.createElement('div');
+      row.className = 'lb-row';
+      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+      row.innerHTML = `<span class="lb-rank">${medal}</span><span class="lb-name">${d.name || 'Anonymous'}</span><span class="lb-ms">${d.ms}ms</span>`;
+      list.appendChild(row);
+    });
+    if (rank === 0) list.innerHTML = '<div style="color:var(--gray);text-align:center;padding:20px">還沒有記錄</div>';
+  }).catch(() => {
+    list.innerHTML = '<div style="color:var(--gray);text-align:center;padding:20px">無法載入</div>';
+  });
+}
+
+// Share
+function getShareText(avg) {
+  const info = getRank(avg);
+  return `⚡ 反應力測試結果\n\n🏅 等級: ${info.rank}\n⏱️ 平均: ${avg}ms\n📊 ${info.label}\n\n${getTaunt(avg)}\n\n你能比我快嗎？👇\nhttps://yuchenchen-debug.github.io/reaction-test/`;
+}
+
+function generateShareImage(avg) {
+  const canvas = document.getElementById('shareCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = 1080, h = 1080;
+
+  // Background
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, w, h);
+
+  // Top accent
+  const info = getRank(avg);
+  ctx.fillStyle = info.rank === 'F' || info.rank === 'SSS' ? '#ff2d55' : info.color === 'var(--green)' ? '#00ff88' : info.color === 'var(--blue)' ? '#00f0ff' : '#ff2d55';
+  ctx.fillRect(0, 0, w, 6);
+
+  // Title
+  ctx.fillStyle = '#888';
+  ctx.font = '600 36px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('⚡ 反應力測試', w/2, 120);
+
+  // Rank
+  ctx.font = '800 180px JetBrains Mono, monospace';
+  ctx.fillStyle = ctx.fillStyle = info.rank === 'SSS' ? '#ff2d55' : info.rank === 'SS' ? '#ff6b00' : info.rank === 'S' ? '#ffcc00' : info.rank === 'A' ? '#00ff88' : info.rank === 'B' ? '#00f0ff' : '#888';
+  ctx.fillText(info.rank, w/2, 360);
+
+  // MS
+  ctx.font = '800 140px JetBrains Mono, monospace';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(avg + 'ms', w/2, 540);
+
+  // Label
+  ctx.font = '600 32px JetBrains Mono, monospace';
+  ctx.fillStyle = '#888';
+  ctx.fillText('平均反應時間', w/2, 600);
+
+  // Percentile
+  ctx.font = '600 36px JetBrains Mono, monospace';
+  ctx.fillStyle = '#00f0ff';
+  ctx.fillText(info.label, w/2, 700);
+
+  // Taunt
+  ctx.font = '600 32px JetBrains Mono, monospace';
+  ctx.fillStyle = '#ff2d55';
+  const taunt = getTaunt(avg);
+  ctx.fillText(taunt.length > 16 ? taunt.substring(0,16) + '...' : taunt, w/2, 780);
+
+  // Rounds
+  ctx.font = '400 28px JetBrains Mono, monospace';
+  results.forEach((r, i) => {
+    const y = 860 + i * 36;
+    ctx.fillStyle = '#555';
+    ctx.textAlign = 'left';
+    ctx.fillText(`R${i+1}`, 300, y);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = r.foul ? '#00f0ff' : r.ms < 200 ? '#00ff88' : r.ms < 300 ? '#fff' : '#ff2d55';
+    ctx.fillText(r.foul ? '犯規' : r.ms + 'ms', 780, y);
+  });
+
+  // URL
+  ctx.textAlign = 'center';
+  ctx.font = '400 24px JetBrains Mono, monospace';
+  ctx.fillStyle = '#444';
+  ctx.fillText('yuchenchen-debug.github.io/reaction-test', w/2, 1055);
+
+  return canvas;
+}
+
+document.getElementById('shareLine').addEventListener('click', () => {
+  const avg = getAvg();
+  const text = getShareText(avg);
+  window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent('https://yuchenchen-debug.github.io/reaction-test/') + '&text=' + encodeURIComponent(text));
+});
+
+document.getElementById('shareTwitter').addEventListener('click', () => {
+  const avg = getAvg();
+  const text = getShareText(avg);
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text));
+});
+
+document.getElementById('shareCopy').addEventListener('click', () => {
+  const avg = getAvg();
+  navigator.clipboard.writeText(getShareText(avg)).then(() => {
+    document.getElementById('shareCopy').textContent = '✅ 已複製';
+    setTimeout(() => document.getElementById('shareCopy').textContent = '📋 複製', 2000);
+  });
+});
+
+document.getElementById('shareIG').addEventListener('click', () => {
+  const avg = getAvg();
+  generateShareImage(avg);
+  const canvas = document.getElementById('shareCanvas');
+  canvas.toBlob(blob => {
+    if (navigator.share) {
+      const file = new File([blob], 'reaction-test.png', {type:'image/png'});
+      navigator.share({files:[file], title:'反應力測試'}).catch(()=>{});
+    } else {
+      downloadImage();
+    }
+  });
+});
+
+document.getElementById('shareDL').addEventListener('click', downloadImage);
+
+function downloadImage() {
+  const avg = getAvg();
+  generateShareImage(avg);
+  const canvas = document.getElementById('shareCanvas');
+  const link = document.createElement('a');
+  link.download = 'reaction-test-' + avg + 'ms.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function getAvg() {
+  const totalMs = results.reduce((sum, r) => sum + r.ms, 0);
+  return Math.round(totalMs / results.length);
+}
+
+// Buttons
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('retryBtn').addEventListener('click', startGame);
+document.getElementById('lbBtn').addEventListener('click', () => { loadLeaderboard(); document.getElementById('lbModal').classList.add('show'); });
+document.getElementById('lbBtn2').addEventListener('click', () => { loadLeaderboard(); document.getElementById('lbModal').classList.add('show'); });
+document.getElementById('closeLb').addEventListener('click', () => { document.getElementById('lbModal').classList.remove('show'); });
+document.getElementById('lbModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) document.getElementById('lbModal').classList.remove('show'); });
+
+// Init
+showPB();
+
+// Prevent double-tap zoom on mobile
+document.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  e.target.click();
+}, {passive: false});
+
+// Push ads on load
+try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+</script>
+</body>
+</html>
